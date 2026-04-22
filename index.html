@@ -5,7 +5,7 @@
 
 <style>
 body { font-family: Arial; background:#ffe4ec; padding:20px; }
-h1 { text-align:center; color:#ff4da6; }
+h1,h2 { text-align:center; color:#ff4da6; }
 
 .container {
   max-width:420px;
@@ -13,6 +13,7 @@ h1 { text-align:center; color:#ff4da6; }
   background:white;
   padding:20px;
   border-radius:15px;
+  margin-bottom:15px;
 }
 
 .grid {
@@ -21,19 +22,8 @@ h1 { text-align:center; color:#ff4da6; }
   gap:10px;
 }
 
-.card {
-  border-radius:12px;
-  overflow:hidden;
-  cursor:pointer;
-  border:2px solid transparent;
-}
-.card:hover { border:2px solid #ff4da6; }
-
-.card img {
-  width:100%;
-  height:110px;
-  object-fit:cover;
-}
+.card { cursor:pointer; }
+.card img { width:100%; height:110px; object-fit:cover; }
 
 input, select {
   width:100%;
@@ -48,7 +38,6 @@ button {
   color:white;
   border:none;
   cursor:pointer;
-  margin-top:5px;
 }
 
 .order {
@@ -59,8 +48,8 @@ button {
 }
 
 .sales {
-  margin-top:15px;
   font-weight:bold;
+  margin-top:10px;
 }
 
 .hidden { display:none; }
@@ -71,15 +60,28 @@ button {
 
 <h1>🎂 Zoe's Cakes</h1>
 
-<!-- 🔐 LOGIN -->
+<!-- CUSTOMER ORDER -->
+<div class="container">
+<h2>Order Your Cake 💖</h2>
+
+<input id="c_name" placeholder="Your Name">
+<input id="c_cake" placeholder="Cake Type">
+<input id="c_size" placeholder="Size">
+<input id="c_price" placeholder="Budget / Price">
+<input id="c_date" type="date">
+
+<button onclick="submitCustomerOrder()">💖 Place Order</button>
+</div>
+
+<!-- LOGIN -->
 <div class="container" id="loginBox">
-<h3>Admin Login</h3>
+<h2>Admin Login</h2>
 <input id="user" placeholder="Username">
 <input id="pass" type="password" placeholder="Password">
 <button onclick="login()">Login</button>
 </div>
 
-<!-- 🧁 SYSTEM -->
+<!-- ADMIN SYSTEM -->
 <div id="system" class="hidden">
 
 <div class="container">
@@ -87,29 +89,15 @@ button {
 <input id="name" placeholder="Customer Name">
 
 <div class="grid">
-<div class="card" onclick="pick('drip')"><img src="drip.jpg"></div>
-<div class="card" onclick="pick('one')"><img src="cupcake.jpg"></div>
-<div class="card" onclick="pick('mini')"><img src="mini.jpg"></div>
-<div class="card" onclick="pick('standard')"><img src="tiered.jpg"></div>
-<div class="card" onclick="pick('wedding')"><img src="wedding.jpg"></div>
+<div class="card" onclick="pick('Drip Cake')"><img src="drip.jpg"></div>
+<div class="card" onclick="pick('1 Tier Cake')"><img src="cupcake.jpg"></div>
+<div class="card" onclick="pick('Mini Tiered')"><img src="mini.jpg"></div>
+<div class="card" onclick="pick('Standard Tiered')"><img src="tiered.jpg"></div>
+<div class="card" onclick="pick('Wedding Cake')"><img src="wedding.jpg"></div>
 </div>
 
 <input id="cakeType" placeholder="Cake Type">
-
-<select id="sizeSelect">
-<option value="">Size</option>
-<option>Small</option>
-<option>Medium</option>
-<option>Large</option>
-</select>
-
-<select id="extraOption">
-<option value="">Extra</option>
-<option value="No Cupcake">1 Tier Only</option>
-<option value="With 12 Cupcakes">With Cupcakes</option>
-</select>
-
-<input id="size" placeholder="Final Size">
+<input id="size" placeholder="Size">
 <input id="price" placeholder="Price">
 <input id="date" type="date">
 
@@ -137,11 +125,11 @@ button {
 <button onclick="clearAll()">🗑 Clear All</button>
 
 <div class="sales">
-💰 Today: ₱<span id="today">0</span> |
-💰 Month: ₱<span id="month">0</span>
+💰 Today: ₱<span id="today">0</span><br>
+💰 Monthly: ₱<span id="month">0</span>
 </div>
 
-<h3>Orders</h3>
+<h2>Orders</h2>
 <div id="orders"></div>
 
 </div>
@@ -161,21 +149,25 @@ alert("Wrong login");
 
 let orders = JSON.parse(localStorage.getItem("orders")) || [];
 
-function pick(p){
-if(p==="drip") cakeType.value="Drip Cake";
-if(p==="one") cakeType.value="1 Tier Cake";
-if(p==="mini") cakeType.value="Mini Tiered";
-if(p==="standard") cakeType.value="Standard Tiered";
-if(p==="wedding") cakeType.value="Wedding Cake (₱3500+)";
-}
-
-sizeSelect.onchange=()=> size.value=sizeSelect.value;
-
-extraOption.onchange=()=>{
-if(cakeType.value.includes("1 Tier")){
-cakeType.value="1 Tier - "+extraOption.value;
-}
+function submitCustomerOrder(){
+let o={
+id:"ZC-"+Date.now(),
+name:c_name.value,
+cakeType:c_cake.value,
+size:c_size.value,
+price:parseInt(c_price.value)||0,
+date:c_date.value,
+status:"Pending"
 };
+orders.push(o);
+localStorage.setItem("orders",JSON.stringify(orders));
+alert("Order submitted 💖");
+displayOrders();
+}
+
+function pick(type){
+cakeType.value = type;
+}
 
 function addOrder(){
 let o={
@@ -187,6 +179,12 @@ price:parseInt(price.value),
 date:date.value,
 status:status.value
 };
+
+if(!o.name || !o.cakeType || !o.price){
+alert("Fill required fields!");
+return;
+}
+
 orders.push(o);
 localStorage.setItem("orders",JSON.stringify(orders));
 displayOrders();
@@ -199,7 +197,7 @@ displayOrders();
 }
 
 function clearAll(){
-if(confirm("Delete all?")){
+if(confirm("Delete all orders?")){
 orders=[];
 localStorage.removeItem("orders");
 displayOrders();
@@ -218,16 +216,15 @@ w.document.write(`
 <p>${o.date}</p>
 <p>${o.status}</p>
 <hr>
-<p style="text-align:center;">Scan to Pay</p>
-<img src="qr.png" width="150">
+<p style="text-align:center;">Thank you!</p>
 `);
 w.print();
 }
 
 function displayOrders(){
 
-let search=searchInput();
-let filter=filterValue();
+let searchVal = document.getElementById("search").value.toLowerCase();
+let filterVal = document.getElementById("filter").value;
 
 let container=document.getElementById("orders");
 container.innerHTML="";
@@ -240,8 +237,8 @@ let month=new Date().getMonth();
 
 orders.forEach(o=>{
 
-if(o.name.toLowerCase().includes(search)){
-if(filter==="All"||o.status===filter){
+if(o.name.toLowerCase().includes(searchVal)){
+if(filterVal==="All"||o.status===filterVal){
 
 if(o.status==="Paid"){
 if(o.date===today) todayTotal+=o.price;
@@ -259,24 +256,15 @@ container.innerHTML+=`
 ❤️ ${o.status}<br><br>
 
 <button onclick='printOrder(${JSON.stringify(o)})'>🧾 Print</button>
-<button onclick='deleteOrder("${o.id}")'>❌ Delete</button>
+<button onclick="deleteOrder('${o.id}')">❌ Delete</button>
 </div>
 `;
-
 }
 }
-
 });
 
 document.getElementById("today").innerText=todayTotal;
 document.getElementById("month").innerText=monthTotal;
-}
-
-function searchInput(){
-return document.getElementById("search").value.toLowerCase();
-}
-function filterValue(){
-return document.getElementById("filter").value;
 }
 
 displayOrders();
