@@ -5,7 +5,6 @@
 
 <style>
 body { font-family: Arial; background: #ffe4ec; padding: 20px; }
-
 h1 { text-align: center; color: #ff4da6; }
 
 .container {
@@ -80,41 +79,41 @@ button {
 
 <input id="name" placeholder="Customer Name">
 
-<!-- 🎂 CLICKABLE MENU -->
+<!-- 🎂 CLICKABLE THEMED MENU -->
 <div class="grid">
 
 <div class="card" onclick="pick('small')">
-<img src="https://i.imgur.com/8Km9tLL.jpg">
-<p>Small ₱380</p>
+<img src="https://images.unsplash.com/photo-1603532648955-039310d9ed75">
+<p>Drip Small ₱380</p>
 </div>
 
 <div class="card" onclick="pick('medium')">
-<img src="https://i.imgur.com/5tj6S7O.jpg">
-<p>Medium ₱580</p>
+<img src="https://images.unsplash.com/photo-1559622214-7d0c4c43dcae">
+<p>Drip Medium ₱580</p>
 </div>
 
 <div class="card" onclick="pick('large')">
-<img src="https://i.imgur.com/Y3b7XQp.jpg">
-<p>Large ₱700</p>
+<img src="https://images.unsplash.com/photo-1601972599720-bb9f0a9d3a1e">
+<p>Drip Large ₱700</p>
 </div>
 
 <div class="card" onclick="pick('rect')">
-<img src="https://i.imgur.com/2DhmtJ4.jpg">
-<p>Rect ₱850</p>
+<img src="https://images.unsplash.com/photo-1621303837174-89787a7d4729">
+<p>Rectangular ₱850</p>
 </div>
 
 <div class="card" onclick="pick('pkg1')">
-<img src="https://i.imgur.com/Fo3pXwK.jpg">
+<img src="https://images.unsplash.com/photo-1614707267537-b85aaf00c4b7">
 <p>1 Tier + Cupcake ₱1350</p>
 </div>
 
 <div class="card" onclick="pick('pkg2')">
-<img src="https://i.imgur.com/7QZ5Y0P.jpg">
+<img src="https://images.unsplash.com/photo-1599785209707-28c4a0d8f5a0">
 <p>Mini Tiered ₱2350</p>
 </div>
 
 <div class="card" onclick="pick('pkg3')">
-<img src="https://i.imgur.com/3ZQ3Z8F.jpg">
+<img src="https://images.unsplash.com/photo-1627308595229-7830a5c91f9f">
 <p>Standard Tier ₱2800</p>
 </div>
 
@@ -143,7 +142,7 @@ button {
 
 let orders = JSON.parse(localStorage.getItem("orders")) || [];
 
-// 🎂 CLICK PICK
+// 🎂 PICK PACKAGE
 function pick(pkg) {
 
 if (pkg === "small") {
@@ -171,7 +170,7 @@ price.value = "850";
 }
 
 if (pkg === "pkg1") {
-cakeType.value = "1 Tier Cake + 12 Cupcakes";
+cakeType.value = "1 Tier + 12 Cupcakes";
 size.value = "6x4";
 price.value = "1350";
 }
