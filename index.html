@@ -4,104 +4,284 @@
 <title>Zoe's Cakes 🎂</title>
 
 <style>
-body {
-  font-family: Arial;
-  background: #ffe4ec;
-  padding: 20px;
-}
-h1 {
-  text-align: center;
-  color: #ff4da6;
-}
+body { font-family: Arial; background:#ffe4ec; padding:20px; }
+h1 { text-align:center; color:#ff4da6; }
+
 .container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
+  max-width:420px;
+  margin:auto;
+  background:white;
+  padding:20px;
+  border-radius:15px;
 }
+
+.grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
 .card {
-  background: white;
-  padding: 10px;
-  border-radius: 15px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  text-align: center;
+  border-radius:12px;
+  overflow:hidden;
+  cursor:pointer;
+  border:2px solid transparent;
 }
+.card:hover { border:2px solid #ff4da6; }
+
 .card img {
-  width: 100%;
-  border-radius: 10px;
+  width:100%;
+  height:110px;
+  object-fit:cover;
 }
+
+input, select {
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+}
+
 button {
-  background: #ff4da6;
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 10px;
-  cursor: pointer;
-  margin-top: 10px;
+  width:100%;
+  padding:10px;
+  background:#ff4da6;
+  color:white;
+  border:none;
+  cursor:pointer;
+  margin-top:5px;
 }
-select {
-  padding: 5px;
-  margin-top: 5px;
+
+.order {
+  background:white;
+  margin-top:10px;
+  padding:10px;
+  border-left:5px solid pink;
 }
+
+.sales {
+  margin-top:15px;
+  font-weight:bold;
+}
+
+.hidden { display:none; }
 </style>
 </head>
 
 <body>
 
-<h1>💖 Zoe's Cake Packages 💖</h1>
+<h1>🎂 Zoe's Cakes</h1>
+
+<!-- 🔐 LOGIN -->
+<div class="container" id="loginBox">
+<h3>Admin Login</h3>
+<input id="user" placeholder="Username">
+<input id="pass" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+</div>
+
+<!-- 🧁 SYSTEM -->
+<div id="system" class="hidden">
 
 <div class="container">
 
-<div class="card">
-<img src="drip.jpg">
-<h3>🎂 Drip Cake</h3>
-<select>
-<option>Small - ₱380</option>
-<option>Medium - ₱580</option>
-<option>Large - ₱700</option>
-<option>Rectangle 8x12 - ₱850</option>
-</select>
-<button>Add Order</button>
+<input id="name" placeholder="Customer Name">
+
+<div class="grid">
+<div class="card" onclick="pick('drip')"><img src="drip.jpg"></div>
+<div class="card" onclick="pick('one')"><img src="cupcake.jpg"></div>
+<div class="card" onclick="pick('mini')"><img src="mini.jpg"></div>
+<div class="card" onclick="pick('standard')"><img src="tiered.jpg"></div>
+<div class="card" onclick="pick('wedding')"><img src="wedding.jpg"></div>
 </div>
 
-<div class="card">
-<img src="cupcake.jpg">
-<h3>🧁 With Cupcake Package</h3>
-<select>
-<option>1 Tier (6x4) + 12 cupcakes - ₱1350</option>
-<option>Mini Tier (7 & 5) + 12 cupcakes - ₱2350</option>
-<option>Standard Tier (8 & 6) + 12 cupcakes - ₱2800</option>
-</select>
-<button>Add Order</button>
-</div>
+<input id="cakeType" placeholder="Cake Type">
 
-<div class="card">
-<img src="mini.jpg">
-<h3>🎀 Mini Tiered Cake</h3>
-<select>
-<option>Custom Price</option>
+<select id="sizeSelect">
+<option value="">Size</option>
+<option>Small</option>
+<option>Medium</option>
+<option>Large</option>
 </select>
-<button>Add Order</button>
-</div>
 
-<div class="card">
-<img src="tiered.jpg">
-<h3>🎉 Standard Tiered Cake</h3>
-<select>
-<option>Custom Price</option>
+<select id="extraOption">
+<option value="">Extra</option>
+<option value="No Cupcake">1 Tier Only</option>
+<option value="With 12 Cupcakes">With Cupcakes</option>
 </select>
-<button>Add Order</button>
-</div>
 
-<div class="card">
-<img src="wedding.jpg">
-<h3>💍 Wedding Cake</h3>
-<select>
-<option>Starting ₱3500</option>
+<input id="size" placeholder="Final Size">
+<input id="price" placeholder="Price">
+<input id="date" type="date">
+
+<select id="status">
+<option>Pending</option>
+<option>Paid</option>
+<option>Claimed</option>
 </select>
-<button>Add Order</button>
-</div>
+
+<button onclick="addOrder()">✨ Add Order</button>
 
 </div>
+
+<div class="container">
+
+<input id="search" placeholder="Search..." oninput="displayOrders()">
+
+<select id="filter" onchange="displayOrders()">
+<option value="All">All</option>
+<option value="Paid">Paid</option>
+<option value="Pending">Pending</option>
+<option value="Claimed">Claimed</option>
+</select>
+
+<button onclick="clearAll()">🗑 Clear All</button>
+
+<div class="sales">
+💰 Today: ₱<span id="today">0</span> |
+💰 Month: ₱<span id="month">0</span>
+</div>
+
+<h3>Orders</h3>
+<div id="orders"></div>
+
+</div>
+
+</div>
+
+<script>
+
+function login(){
+if(user.value==="admin" && pass.value==="1234"){
+loginBox.style.display="none";
+system.classList.remove("hidden");
+}else{
+alert("Wrong login");
+}
+}
+
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+function pick(p){
+if(p==="drip") cakeType.value="Drip Cake";
+if(p==="one") cakeType.value="1 Tier Cake";
+if(p==="mini") cakeType.value="Mini Tiered";
+if(p==="standard") cakeType.value="Standard Tiered";
+if(p==="wedding") cakeType.value="Wedding Cake (₱3500+)";
+}
+
+sizeSelect.onchange=()=> size.value=sizeSelect.value;
+
+extraOption.onchange=()=>{
+if(cakeType.value.includes("1 Tier")){
+cakeType.value="1 Tier - "+extraOption.value;
+}
+};
+
+function addOrder(){
+let o={
+id:"ZC-"+Date.now(),
+name:name.value,
+cakeType:cakeType.value,
+size:size.value,
+price:parseInt(price.value),
+date:date.value,
+status:status.value
+};
+orders.push(o);
+localStorage.setItem("orders",JSON.stringify(orders));
+displayOrders();
+}
+
+function deleteOrder(id){
+orders=orders.filter(o=>o.id!==id);
+localStorage.setItem("orders",JSON.stringify(orders));
+displayOrders();
+}
+
+function clearAll(){
+if(confirm("Delete all?")){
+orders=[];
+localStorage.removeItem("orders");
+displayOrders();
+}
+}
+
+function printOrder(o){
+let w=window.open("","","width=300,height=600");
+w.document.write(`
+<h2 style="text-align:center;">💖 Zoe's Cakes 💖</h2>
+<p>${o.id}</p>
+<p>${o.name}</p>
+<p>${o.cakeType}</p>
+<p>${o.size}</p>
+<p>₱${o.price}</p>
+<p>${o.date}</p>
+<p>${o.status}</p>
+<hr>
+<p style="text-align:center;">Scan to Pay</p>
+<img src="qr.png" width="150">
+`);
+w.print();
+}
+
+function displayOrders(){
+
+let search=searchInput();
+let filter=filterValue();
+
+let container=document.getElementById("orders");
+container.innerHTML="";
+
+let todayTotal=0;
+let monthTotal=0;
+
+let today=new Date().toISOString().split("T")[0];
+let month=new Date().getMonth();
+
+orders.forEach(o=>{
+
+if(o.name.toLowerCase().includes(search)){
+if(filter==="All"||o.status===filter){
+
+if(o.status==="Paid"){
+if(o.date===today) todayTotal+=o.price;
+if(new Date(o.date).getMonth()===month) monthTotal+=o.price;
+}
+
+container.innerHTML+=`
+<div class="order">
+<b>${o.id}</b><br>
+👤 ${o.name}<br>
+🎂 ${o.cakeType}<br>
+📏 ${o.size}<br>
+💰 ₱${o.price}<br>
+📅 ${o.date}<br>
+❤️ ${o.status}<br><br>
+
+<button onclick='printOrder(${JSON.stringify(o)})'>🧾 Print</button>
+<button onclick='deleteOrder("${o.id}")'>❌ Delete</button>
+</div>
+`;
+
+}
+}
+
+});
+
+document.getElementById("today").innerText=todayTotal;
+document.getElementById("month").innerText=monthTotal;
+}
+
+function searchInput(){
+return document.getElementById("search").value.toLowerCase();
+}
+function filterValue(){
+return document.getElementById("filter").value;
+}
+
+displayOrders();
+
+</script>
 
 </body>
 </html>
