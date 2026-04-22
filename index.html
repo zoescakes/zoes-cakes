@@ -10,19 +10,28 @@
   <style>
     body {
       font-family: Arial;
-      padding: 20px;
       background: #fff0f5;
+      padding: 20px;
     }
 
     h1 {
+      text-align: center;
       color: #ff69b4;
     }
 
+    .box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
     input, select, button {
-      display: block;
-      margin: 10px 0;
+      width: 100%;
       padding: 10px;
-      width: 250px;
+      margin: 8px 0;
     }
 
     button {
@@ -32,8 +41,11 @@
       cursor: pointer;
     }
 
-    #orders {
-      margin-top: 20px;
+    .order {
+      background: white;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 8px;
     }
   </style>
 </head>
@@ -42,19 +54,21 @@
 
 <h1>Zoe's Cake Orders 🎂</h1>
 
-<input id="name" placeholder="Customer Name">
-<input id="cake" placeholder="Cake Type">
-<input id="size" placeholder="Size">
-<input id="price" placeholder="Price">
-<input id="date" type="date">
+<div class="box">
+  <input id="name" placeholder="Customer Name">
+  <input id="cake" placeholder="Cake Type">
+  <input id="size" placeholder="Size">
+  <input id="price" placeholder="Price">
+  <input id="date" type="date">
 
-<select id="status">
-  <option>Pending</option>
-  <option>Paid</option>
-  <option>Claimed</option>
-</select>
+  <select id="status">
+    <option>Pending</option>
+    <option>Paid</option>
+    <option>Claimed</option>
+  </select>
 
-<button onclick="addOrder()">Submit Order</button>
+  <button onclick="addOrder()">Submit Order</button>
+</div>
 
 <h2>Orders</h2>
 <div id="orders"></div>
@@ -81,15 +95,29 @@
     const status = document.getElementById("status").value;
 
     if (!name || !cake) {
-      alert("Please fill all fields");
+      alert("Fill all fields");
       return;
     }
 
     db.collection("orders").add({
       name, cake, size, price, date, status
     });
+  }
 
-    alert("Order added!");
+  function deleteOrder(id) {
+    db.collection("orders").doc(id).delete();
+  }
+
+  function printOrder(o) {
+    const w = window.open('', '', 'width=300,height=400');
+    w.document.write(`
+      <h3>Zoe's Cakes</h3>
+      <p>${o.name}</p>
+      <p>${o.cake}</p>
+      <p>₱${o.price}</p>
+      <p>${o.status}</p>
+    `);
+    w.print();
   }
 
   db.collection("orders").onSnapshot(snapshot => {
@@ -98,7 +126,13 @@
 
     snapshot.forEach(doc => {
       const o = doc.data();
-      ordersDiv.innerHTML += `<p>${o.name} - ${o.cake} - ₱${o.price} (${o.status})</p>`;
+      ordersDiv.innerHTML += `
+        <div class="order">
+          ${o.name} - ${o.cake} - ₱${o.price} (${o.status})<br>
+          <button onclick="printOrder(${JSON.stringify(o)})">Print</button>
+          <button onclick="deleteOrder('${doc.id}')">Delete</button>
+        </div>
+      `;
     });
   });
 </script>
