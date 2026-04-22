@@ -86,51 +86,52 @@ button {
 <!-- 🎂 MENU -->
 <div class="grid">
 
-<div class="card" onclick="pick('small')">
+<div class="card" onclick="pick('drip')">
 <img src="images/drip.jpg">
-<p>Drip Small ₱380</p>
+<p>Drip Cake</p>
 </div>
 
-<div class="card" onclick="pick('medium')">
-<img src="images/drip.jpg">
-<p>Drip Medium ₱580</p>
-</div>
-
-<div class="card" onclick="pick('large')">
-<img src="images/drip.jpg">
-<p>Drip Large ₱700</p>
-</div>
-
-<div class="card" onclick="pick('rect')">
-<img src="images/rect.jpg">
-<p>Rect ₱850</p>
-</div>
-
-<div class="card" onclick="pick('pkg1')">
+<div class="card" onclick="pick('one')">
 <img src="images/cupcake.jpg">
-<p>1 Tier ₱1350</p>
+<p>1 Tier Cake</p>
 </div>
 
-<div class="card" onclick="pick('pkg2')">
+<div class="card" onclick="pick('mini')">
 <img src="images/mini.jpg">
-<p>Mini Tier ₱2350</p>
+<p>Mini Tiered</p>
 </div>
 
-<div class="card" onclick="pick('pkg3')">
+<div class="card" onclick="pick('standard')">
 <img src="images/tiered.jpg">
-<p>Standard ₱2800</p>
+<p>Standard Tiered</p>
 </div>
 
 <div class="card" onclick="pick('wedding')">
 <img src="images/wedding.jpg">
-<p>Wedding ₱3500</p>
+<p>Wedding Cake (Start ₱3500)</p>
 </div>
 
 </div>
 
 <input id="cakeType" placeholder="Cake Type">
-<input id="size" placeholder="Size">
-<input id="price" placeholder="Price">
+
+<!-- SIZE OPTION -->
+<select id="sizeSelect">
+<option value="">Select Size</option>
+<option>Small</option>
+<option>Medium</option>
+<option>Large</option>
+</select>
+
+<!-- EXTRA OPTION -->
+<select id="extraOption">
+<option value="">Extra Option</option>
+<option value="No Cupcake">1 Tier Only</option>
+<option value="With 12 Cupcakes">With 12 Cupcakes</option>
+</select>
+
+<input id="size" placeholder="Final Size">
+<input id="price" placeholder="Enter Price">
 
 <input id="date" type="date">
 
@@ -156,19 +157,32 @@ button {
 
 let orders = JSON.parse(localStorage.getItem("orders")) || [];
 
+// 🎂 PICK
 function pick(pkg){
 
-if(pkg==="small"){cakeType.value="Drip Cake";size.value="Small";price.value="380";}
-if(pkg==="medium"){cakeType.value="Drip Cake";size.value="Medium";price.value="580";}
-if(pkg==="large"){cakeType.value="Drip Cake";size.value="Large";price.value="700";}
-if(pkg==="rect"){cakeType.value="Rectangular";size.value="8x12";price.value="850";}
-if(pkg==="pkg1"){cakeType.value="1 Tier + 12 Cupcakes";size.value="6x4";price.value="1350";}
-if(pkg==="pkg2"){cakeType.value="Mini Tiered";size.value="7 & 5";price.value="2350";}
-if(pkg==="pkg3"){cakeType.value="Standard Tiered";size.value="8 & 6";price.value="2800";}
-if(pkg==="wedding"){cakeType.value="Wedding Cake";size.value="2 Tier";price.value="3500";}
+if(pkg==="drip"){cakeType.value="Drip Cake";}
+if(pkg==="one"){cakeType.value="1 Tier Cake";}
+if(pkg==="mini"){cakeType.value="Mini Tiered Cake";}
+if(pkg==="standard"){cakeType.value="Standard Tiered Cake";}
+if(pkg==="wedding"){cakeType.value="Wedding Cake (Starting ₱3500)";}
 
+size.value="";
+price.value="";
 }
 
+// SIZE AUTO
+document.getElementById("sizeSelect").addEventListener("change", function(){
+document.getElementById("size").value = this.value;
+});
+
+// EXTRA OPTION
+document.getElementById("extraOption").addEventListener("change", function(){
+if(cakeType.value.includes("1 Tier")){
+cakeType.value = "1 Tier Cake - " + this.value;
+}
+});
+
+// ➕ ADD ORDER
 function addOrder(){
 const order={
 id:"ZC-"+Date.now(),
@@ -185,12 +199,14 @@ localStorage.setItem("orders",JSON.stringify(orders));
 displayOrders();
 }
 
+// ❌ DELETE
 function deleteOrder(id){
 orders=orders.filter(o=>o.id!==id);
 localStorage.setItem("orders",JSON.stringify(orders));
 displayOrders();
 }
 
+// 🧾 PRINT
 function printOrder(o){
 let w=window.open("","","width=300,height=600");
 w.document.write(`
@@ -206,6 +222,7 @@ w.document.write(`
 w.print();
 }
 
+// 📦 DISPLAY
 function displayOrders(){
 const container=document.getElementById("orders");
 container.innerHTML="";
