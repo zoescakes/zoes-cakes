@@ -4,7 +4,7 @@
 <title>Zoe's Cakes</title>
 
 <style>
-body { font-family: Calibri; background:#ffd6e7; margin:0; }
+body { font-family: Dancing moon script; background:#ffd6e7; margin:0; }
 h1 { text-align:center; color:#ff4d94; }
 
 .main { display:flex; height:95vh; }
@@ -12,23 +12,11 @@ h1 { text-align:center; color:#ff4d94; }
 .left { width:40%; padding:10px; overflow:auto; }
 .right { width:60%; padding:10px; display:flex; flex-direction:column; gap:10px; }
 
-.container {
-background:white;
-padding:15px;
-border-radius:20px;
-}
+.container { background:white; padding:15px; border-radius:20px; }
 
-.cakes {
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-}
+.cakes { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
-img {
-width:100%;
-border-radius:15px;
-cursor:pointer;
-}
+img { width:100%; border-radius:15px; cursor:pointer; }
 
 input, select {
 width:95%;
@@ -62,9 +50,9 @@ border-radius:10px;
 
 <div class="main">
 
+<!-- LEFT -->
 <div class="left container">
 <h3>Choose Cake</h3>
-
 <div class="cakes">
 <img src="drip.jpg" onclick="selectCake('Drip Cake')">
 <img src="mini.jpg" onclick="selectCake('Mini Tiered')">
@@ -74,6 +62,7 @@ border-radius:10px;
 </div>
 </div>
 
+<!-- RIGHT -->
 <div class="right">
 
 <div class="container">
@@ -82,7 +71,7 @@ border-radius:10px;
 <input id="name" placeholder="Customer Name">
 <input id="cake" placeholder="Cake Type" readonly>
 
-<select id="size">
+<select id="size" onchange="autoPrice()">
 <option value="">Size</option>
 <option>Small</option>
 <option>Medium</option>
@@ -101,6 +90,8 @@ border-radius:10px;
 <h4>GCash: 09062070504</h4>
 
 <button onclick="saveOrder()">Save Order</button>
+<button onclick="printCurrent()">Print Receipt</button>
+
 </div>
 
 <div class="container">
@@ -138,47 +129,33 @@ if(cake=="Wedding Cake") p=3500;
 document.getElementById("price").value = p;
 }
 
-// IMPORTANT FIXED FUNCTION
 function saveOrder(){
-
 let name = document.getElementById("name").value;
 let cake = document.getElementById("cake").value;
-let size = document.getElementById("size").value;
 let price = document.getElementById("price").value;
 let status = document.getElementById("status").value;
 
-// VALIDATION
 if(name=="" || cake=="" || price==""){
-alert("Please complete order first!");
+alert("Complete the order first!");
 return;
 }
 
-let order = {
-name:name,
-cake:cake,
-size:size,
-price:price,
-status:status
-};
+let order = {name,cake,price,status};
 
 let data = JSON.parse(localStorage.getItem("orders")) || [];
 data.push(order);
-
 localStorage.setItem("orders", JSON.stringify(data));
 
-alert("Order Saved!");
+alert("Saved!");
 showOrders();
 }
 
 function showOrders(){
-
 let data = JSON.parse(localStorage.getItem("orders")) || [];
-let html = "";
-let total = 0;
+let html="";
+let total=0;
 
-for(let i=0;i<data.length;i++){
-
-let o = data[i];
+data.forEach((o,i)=>{
 
 if(o.status=="Paid"){
 total += Number(o.price);
@@ -190,9 +167,10 @@ ${o.name} | ${o.cake} | ₱${o.price} | ${o.status}
 <br>
 <button onclick="markPaid(${i})">Paid</button>
 <button onclick="markClaim(${i})">Claimed</button>
+<button onclick="printOne(${i})">🧾</button>
 <button onclick="deleteOrder(${i})">❌</button>
 </div>`;
-}
+});
 
 document.getElementById("orders").innerHTML = html;
 document.getElementById("total").innerText = total;
@@ -200,14 +178,14 @@ document.getElementById("total").innerText = total;
 
 function markPaid(i){
 let data = JSON.parse(localStorage.getItem("orders"));
-data[i].status = "Paid";
+data[i].status="Paid";
 localStorage.setItem("orders", JSON.stringify(data));
 showOrders();
 }
 
 function markClaim(i){
 let data = JSON.parse(localStorage.getItem("orders"));
-data[i].status = "Claimed";
+data[i].status="Claimed";
 localStorage.setItem("orders", JSON.stringify(data));
 showOrders();
 }
@@ -217,6 +195,40 @@ let data = JSON.parse(localStorage.getItem("orders"));
 data.splice(i,1);
 localStorage.setItem("orders", JSON.stringify(data));
 showOrders();
+}
+
+// PRINT CURRENT ORDER
+function printCurrent(){
+let name = document.getElementById("name").value;
+let cake = document.getElementById("cake").value;
+let price = document.getElementById("price").value;
+
+let w = window.open("");
+w.document.write(`
+<h2>Zoe's Cakes</h2>
+<p>${name}</p>
+<p>${cake}</p>
+<p>₱${price}</p>
+<p>GCash: 09764183834</p>
+`);
+w.print();
+}
+
+// PRINT FROM LIST
+function printOne(i){
+let data = JSON.parse(localStorage.getItem("orders"));
+let o = data[i];
+
+let w = window.open("");
+w.document.write(`
+<h2>Zoe's Cakes</h2>
+<p>${o.name}</p>
+<p>${o.cake}</p>
+<p>₱${o.price}</p>
+<p>${o.status}</p>
+<p>GCash: 09764183834</p>
+`);
+w.print();
 }
 
 showOrders();
