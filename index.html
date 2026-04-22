@@ -4,16 +4,9 @@
 <title>Zoe's Cakes 🎂</title>
 
 <style>
-body {
-  font-family: Arial;
-  background: #ffe4ec;
-  padding: 20px;
-}
+body { font-family: Arial; background: #ffe4ec; padding: 20px; }
 
-h1 {
-  text-align: center;
-  color: #ff4da6;
-}
+h1 { text-align: center; color: #ff4da6; }
 
 .container {
   max-width: 400px;
@@ -21,6 +14,37 @@ h1 {
   background: white;
   padding: 20px;
   border-radius: 15px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.card:hover {
+  border: 2px solid #ff4da6;
+}
+
+.card img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+}
+
+.card p {
+  text-align: center;
+  font-size: 12px;
+  padding: 5px;
 }
 
 input, select {
@@ -35,7 +59,7 @@ button {
   background: #ff4da6;
   color: white;
   border: none;
-  margin-top: 10px;
+  cursor: pointer;
 }
 
 .order {
@@ -50,18 +74,51 @@ button {
 
 <body>
 
-<h1>Zoe's Cake Orders 🎂</h1>
+<h1>Zoe's Cakes 🎂</h1>
 
 <div class="container">
 
 <input id="name" placeholder="Customer Name">
 
-<select id="package" onchange="selectPackage()">
-  <option value="">🎂 Select Package</option>
-  <option value="A">Package A - ₱1500</option>
-  <option value="B">Package B - ₱2500</option>
-  <option value="C">Package C - ₱3500</option>
-</select>
+<!-- 🎂 CLICKABLE MENU -->
+<div class="grid">
+
+<div class="card" onclick="pick('small')">
+<img src="https://i.imgur.com/8Km9tLL.jpg">
+<p>Small ₱380</p>
+</div>
+
+<div class="card" onclick="pick('medium')">
+<img src="https://i.imgur.com/5tj6S7O.jpg">
+<p>Medium ₱580</p>
+</div>
+
+<div class="card" onclick="pick('large')">
+<img src="https://i.imgur.com/Y3b7XQp.jpg">
+<p>Large ₱700</p>
+</div>
+
+<div class="card" onclick="pick('rect')">
+<img src="https://i.imgur.com/2DhmtJ4.jpg">
+<p>Rect ₱850</p>
+</div>
+
+<div class="card" onclick="pick('pkg1')">
+<img src="https://i.imgur.com/Fo3pXwK.jpg">
+<p>1 Tier + Cupcake ₱1350</p>
+</div>
+
+<div class="card" onclick="pick('pkg2')">
+<img src="https://i.imgur.com/7QZ5Y0P.jpg">
+<p>Mini Tiered ₱2350</p>
+</div>
+
+<div class="card" onclick="pick('pkg3')">
+<img src="https://i.imgur.com/3ZQ3Z8F.jpg">
+<p>Standard Tier ₱2800</p>
+</div>
+
+</div>
 
 <input id="cakeType" placeholder="Cake Type">
 <input id="size" placeholder="Size">
@@ -70,9 +127,9 @@ button {
 <input id="date" type="date">
 
 <select id="status">
-  <option>Pending</option>
-  <option>Paid</option>
-  <option>Claimed</option>
+<option>Pending</option>
+<option>Paid</option>
+<option>Claimed</option>
 </select>
 
 <button onclick="addOrder()">✨ Submit Order</button>
@@ -84,65 +141,102 @@ button {
 
 <script>
 
-let orders = [];
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
 
-function selectPackage() {
-  const pkg = document.getElementById("package").value;
+// 🎂 CLICK PICK
+function pick(pkg) {
 
-  if (pkg === "A") {
-    document.getElementById("cakeType").value = "1 Tier Cake";
-    document.getElementById("size").value = "6x3";
-    document.getElementById("price").value = "1500";
-  }
-
-  if (pkg === "B") {
-    document.getElementById("cakeType").value = "2 Tier Cake with Cupcake";
-    document.getElementById("size").value = "8x4 + 6x3";
-    document.getElementById("price").value = "2500";
-  }
-
-  if (pkg === "C") {
-    document.getElementById("cakeType").value = "3 Tier Premium Cake";
-    document.getElementById("size").value = "10x4 + 8x4 + 6x3";
-    document.getElementById("price").value = "3500";
-  }
+if (pkg === "small") {
+cakeType.value = "Drip Cake";
+size.value = "Small";
+price.value = "380";
 }
 
+if (pkg === "medium") {
+cakeType.value = "Drip Cake";
+size.value = "Medium";
+price.value = "580";
+}
+
+if (pkg === "large") {
+cakeType.value = "Drip Cake";
+size.value = "Large";
+price.value = "700";
+}
+
+if (pkg === "rect") {
+cakeType.value = "Rectangular Cake";
+size.value = "8x12";
+price.value = "850";
+}
+
+if (pkg === "pkg1") {
+cakeType.value = "1 Tier Cake + 12 Cupcakes";
+size.value = "6x4";
+price.value = "1350";
+}
+
+if (pkg === "pkg2") {
+cakeType.value = "Mini Tiered + 12 Cupcakes";
+size.value = "7 & 5";
+price.value = "2350";
+}
+
+if (pkg === "pkg3") {
+cakeType.value = "Standard Tiered + 12 Cupcakes";
+size.value = "8 & 6";
+price.value = "2800";
+}
+
+}
+
+// ➕ ADD ORDER
 function addOrder() {
+const order = {
+id: "ZC-" + Date.now(),
+name: name.value,
+cakeType: cakeType.value,
+size: size.value,
+price: parseInt(price.value),
+date: date.value,
+status: status.value
+};
 
-  const name = document.getElementById("name").value;
-  const cakeType = document.getElementById("cakeType").value;
-  const size = document.getElementById("size").value;
-  const price = document.getElementById("price").value;
-  const date = document.getElementById("date").value;
-  const status = document.getElementById("status").value;
-
-  const order = {
-    name, cakeType, size, price, date, status
-  };
-
-  orders.push(order);
-
-  displayOrders();
+orders.push(order);
+localStorage.setItem("orders", JSON.stringify(orders));
+displayOrders();
 }
 
+// ❌ DELETE
+function deleteOrder(id) {
+orders = orders.filter(o => o.id !== id);
+localStorage.setItem("orders", JSON.stringify(orders));
+displayOrders();
+}
+
+// 📦 DISPLAY
 function displayOrders() {
-  const container = document.getElementById("orders");
-  container.innerHTML = "";
+const container = document.getElementById("orders");
+container.innerHTML = "";
 
-  orders.forEach(o => {
-    container.innerHTML += `
-      <div class="order">
-        <b>${o.name}</b><br>
-        🎂 ${o.cakeType}<br>
-        📏 ${o.size}<br>
-        💰 ₱${o.price}<br>
-        📅 ${o.date}<br>
-        ❤️ ${o.status}
-      </div>
-    `;
-  });
+orders.forEach(o => {
+container.innerHTML += `
+<div class="order">
+<b>${o.id}</b><br>
+👤 ${o.name}<br>
+🎂 ${o.cakeType}<br>
+📏 ${o.size}<br>
+💰 ₱${o.price}<br>
+📅 ${o.date}<br>
+❤️ ${o.status}<br><br>
+
+<button onclick='deleteOrder("${o.id}")'>❌ Delete</button>
+</div>
+`;
+});
 }
+
+displayOrders();
 
 </script>
 
