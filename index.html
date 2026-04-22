@@ -2,267 +2,110 @@
 <html>
 <head>
 <title>Zoe's Cakes 🎂</title>
-
 <style>
-body { font-family: Arial; background: #ffe4ec; padding: 20px; }
-h1 { text-align: center; color: #ff4da6; }
-
-.container {
-  max-width: 420px;
-  margin: auto;
-  background: white;
+body {
+  font-family: Arial;
+  background: #ffe4ec;
   padding: 20px;
-  border-radius: 15px;
 }
-
-.grid {
+h1 {
+  text-align: center;
+  color: #ff4da6;
+}
+.container {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
 }
-
 .card {
-  background: #fff;
-  border-radius: 12px;
-  overflow: hidden;
-  cursor: pointer;
-  border: 2px solid transparent;
+  background: white;
+  padding: 10px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  text-align: center;
 }
-
-.card:hover {
-  border: 2px solid #ff4da6;
-}
-
 .card img {
   width: 100%;
-  height: 110px;
-  object-fit: cover;
+  border-radius: 10px;
 }
-
-.card p {
-  text-align: center;
-  font-size: 12px;
-  padding: 5px;
-}
-
-input, select {
-  width: 100%;
-  padding: 10px;
-  margin: 6px 0;
-}
-
 button {
-  width: 100%;
-  padding: 12px;
   background: #ff4da6;
   color: white;
   border: none;
-  cursor: pointer;
-  margin-top:5px;
-}
-
-.order {
-  background: white;
-  margin-top: 10px;
   padding: 10px;
-  border-left: 5px solid pink;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 10px;
 }
-
-.sales {
-  margin-top:20px;
-  font-weight:bold;
+select {
+  padding: 5px;
+  margin-top: 5px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>Zoe's Cakes 🎂</h1>
+<h1>💖 Zoe's Cake Packages 💖</h1>
 
 <div class="container">
 
-<input id="name" placeholder="Customer Name">
-
-<!-- 🎂 MENU -->
-<div class="grid">
-
-<div class="card" onclick="pick('drip')">
-<img src="images/drip.jpg">
-<p>Drip Cake</p>
-</div>
-
-<div class="card" onclick="pick('one')">
-<img src="images/cupcake.jpg">
-<p>1 Tier Cake</p>
-</div>
-
-<div class="card" onclick="pick('mini')">
-<img src="images/mini.jpg">
-<p>Mini Tiered</p>
-</div>
-
-<div class="card" onclick="pick('standard')">
-<img src="images/tiered.jpg">
-<p>Standard Tiered</p>
-</div>
-
-<div class="card" onclick="pick('wedding')">
-<img src="images/wedding.jpg">
-<p>Wedding Cake (Start ₱3500)</p>
-</div>
-
-</div>
-
-<input id="cakeType" placeholder="Cake Type">
-
-<!-- SIZE OPTION -->
-<select id="sizeSelect">
-<option value="">Select Size</option>
-<option>Small</option>
-<option>Medium</option>
-<option>Large</option>
+<div class="card">
+<img src="drip.jpg">
+<h3>🎂 Drip Cake</h3>
+<select>
+<option>Small - ₱380</option>
+<option>Medium - ₱580</option>
+<option>Large - ₱700</option>
+<option>Rectangle 8x12 - ₱850</option>
 </select>
+<br>
+<button>Add Order</button>
+</div>
 
-<!-- EXTRA OPTION -->
-<select id="extraOption">
-<option value="">Extra Option</option>
-<option value="No Cupcake">1 Tier Only</option>
-<option value="With 12 Cupcakes">With 12 Cupcakes</option>
+<div class="card">
+<img src="cupcake.jpg">
+<h3>🧁 With Cupcake Package</h3>
+<select>
+<option>1 Tier (6x4) + 12 cupcakes - ₱1350</option>
+<option>Mini Tier (7 & 5) + 12 cupcakes - ₱2350</option>
+<option>Standard Tier (8 & 6) + 12 cupcakes - ₱2800</option>
 </select>
+<br>
+<button>Add Order</button>
+</div>
 
-<input id="size" placeholder="Final Size">
-<input id="price" placeholder="Enter Price">
-
-<input id="date" type="date">
-
-<select id="status">
-<option>Pending</option>
-<option>Paid</option>
-<option>Claimed</option>
+<div class="card">
+<img src="mini.jpg">
+<h3>🎀 Mini Tiered Cake</h3>
+<select>
+<option>Price depends on design</option>
 </select>
-
-<button onclick="addOrder()">✨ Submit Order</button>
-
+<br>
+<button>Add Order</button>
 </div>
 
-<div class="sales">
-💰 Today Sales: ₱<span id="today">0</span><br>
-💰 Monthly Sales: ₱<span id="month">0</span>
+<div class="card">
+<img src="tiered.jpg">
+<h3>🎉 Standard Tiered Cake</h3>
+<select>
+<option>Price depends on design</option>
+</select>
+<br>
+<button>Add Order</button>
 </div>
 
-<h2>🧁 Orders</h2>
-<div id="orders"></div>
-
-<script>
-
-let orders = JSON.parse(localStorage.getItem("orders")) || [];
-
-// 🎂 PICK
-function pick(pkg){
-
-if(pkg==="drip"){cakeType.value="Drip Cake";}
-if(pkg==="one"){cakeType.value="1 Tier Cake";}
-if(pkg==="mini"){cakeType.value="Mini Tiered Cake";}
-if(pkg==="standard"){cakeType.value="Standard Tiered Cake";}
-if(pkg==="wedding"){cakeType.value="Wedding Cake (Starting ₱3500)";}
-
-size.value="";
-price.value="";
-}
-
-// SIZE AUTO
-document.getElementById("sizeSelect").addEventListener("change", function(){
-document.getElementById("size").value = this.value;
-});
-
-// EXTRA OPTION
-document.getElementById("extraOption").addEventListener("change", function(){
-if(cakeType.value.includes("1 Tier")){
-cakeType.value = "1 Tier Cake - " + this.value;
-}
-});
-
-// ➕ ADD ORDER
-function addOrder(){
-const order={
-id:"ZC-"+Date.now(),
-name:name.value,
-cakeType:cakeType.value,
-size:size.value,
-price:parseInt(price.value),
-date:date.value,
-status:status.value
-};
-
-orders.push(order);
-localStorage.setItem("orders",JSON.stringify(orders));
-displayOrders();
-}
-
-// ❌ DELETE
-function deleteOrder(id){
-orders=orders.filter(o=>o.id!==id);
-localStorage.setItem("orders",JSON.stringify(orders));
-displayOrders();
-}
-
-// 🧾 PRINT
-function printOrder(o){
-let w=window.open("","","width=300,height=600");
-w.document.write(`
-<h3 style="text-align:center;">🎂 Zoe's Cakes</h3>
-<p>${o.id}</p>
-<p>${o.name}</p>
-<p>${o.cakeType}</p>
-<p>${o.size}</p>
-<p>₱${o.price}</p>
-<p>${o.date}</p>
-<p>${o.status}</p>
-`);
-w.print();
-}
-
-// 📦 DISPLAY
-function displayOrders(){
-const container=document.getElementById("orders");
-container.innerHTML="";
-
-let todayTotal=0;
-let monthTotal=0;
-
-const today=new Date().toISOString().split("T")[0];
-const month=new Date().getMonth();
-
-orders.forEach(o=>{
-
-if(o.status==="Paid"){
-if(o.date===today) todayTotal+=o.price;
-if(new Date(o.date).getMonth()===month) monthTotal+=o.price;
-}
-
-container.innerHTML+=`
-<div class="order">
-<b>${o.id}</b><br>
-👤 ${o.name}<br>
-🎂 ${o.cakeType}<br>
-📏 ${o.size}<br>
-💰 ₱${o.price}<br>
-📅 ${o.date}<br>
-❤️ ${o.status}<br><br>
-
-<button onclick='printOrder(${JSON.stringify(o)})'>🧾 Print</button>
-<button onclick='deleteOrder("${o.id}")'>❌ Delete</button>
+<div class="card">
+<img src="wedding.jpg">
+<h3>💍 Wedding Cake</h3>
+<select>
+<option>Starting ₱3500</option>
+</select>
+<br>
+<button>Add Order</button>
 </div>
-`;
-});
 
-document.getElementById("today").innerText=todayTotal;
-document.getElementById("month").innerText=monthTotal;
-}
-
-displayOrders();
-
-</script>
+</div>
 
 </body>
 </html>
