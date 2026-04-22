@@ -4,7 +4,7 @@
 <title>Zoe's Cakes</title>
 
 <style>
-body { font-family: Calibre; background:#ffd6e7; margin:0; }
+body { font-family: Calibri; background:#ffd6e7; margin:0; }
 h1 { text-align:center; color:#ff4d94; }
 
 .main { display:flex; height:95vh; }
@@ -38,7 +38,6 @@ border-radius:10px;
 }
 
 button {
-width:auto;
 padding:8px;
 margin:3px;
 background:#ff4d94;
@@ -63,7 +62,6 @@ border-radius:10px;
 
 <div class="main">
 
-<!-- LEFT -->
 <div class="left container">
 <h3>Choose Cake</h3>
 
@@ -76,7 +74,6 @@ border-radius:10px;
 </div>
 </div>
 
-<!-- RIGHT -->
 <div class="right">
 
 <div class="container">
@@ -85,7 +82,7 @@ border-radius:10px;
 <input id="name" placeholder="Customer Name">
 <input id="cake" placeholder="Cake Type" readonly>
 
-<select id="size" onchange="autoPrice()">
+<select id="size">
 <option value="">Size</option>
 <option>Small</option>
 <option>Medium</option>
@@ -103,17 +100,12 @@ border-radius:10px;
 
 <h4>GCash: 09062070504</h4>
 
-<button onclick="placeOrder()">Save Order</button>
-<button onclick="previewOrder()">Preview Order</button>
+<button onclick="saveOrder()">Save Order</button>
 </div>
 
 <div class="container">
 <h3>Sales Tracker</h3>
-
 <h4>Total Sales: ₱<span id="total">0</span></h4>
-
-<input id="search" placeholder="Search name..." oninput="showOrders()">
-
 <div id="orders"></div>
 </div>
 
@@ -123,118 +115,108 @@ border-radius:10px;
 <script>
 
 function selectCake(type){
-cake.value = type;
+document.getElementById("cake").value = type;
 autoPrice();
 }
 
 function autoPrice(){
-let p=0;
+let cake = document.getElementById("cake").value;
+let size = document.getElementById("size").value;
+let p = 0;
 
-if(cake.value=="Drip Cake"){
-if(size.value=="Small") p=380;
-if(size.value=="Medium") p=580;
-if(size.value=="Large") p=700;
+if(cake=="Drip Cake"){
+if(size=="Small") p=380;
+if(size=="Medium") p=580;
+if(size=="Large") p=700;
 }
 
-if(cake.value=="With Cupcakes") p=1350;
-if(cake.value=="Mini Tiered") p=2350;
-if(cake.value=="Tiered Cake") p=2800;
-if(cake.value=="Wedding Cake") p=3500;
+if(cake=="With Cupcakes") p=1350;
+if(cake=="Mini Tiered") p=2350;
+if(cake=="Tiered Cake") p=2800;
+if(cake=="Wedding Cake") p=3500;
 
-price.value = p;
+document.getElementById("price").value = p;
 }
 
-function placeOrder(){
-let o={
-name:name.value,
-cake:cake.value,
-price:price.value,
-date:date.value,
-status:status.value
+// IMPORTANT FIXED FUNCTION
+function saveOrder(){
+
+let name = document.getElementById("name").value;
+let cake = document.getElementById("cake").value;
+let size = document.getElementById("size").value;
+let price = document.getElementById("price").value;
+let status = document.getElementById("status").value;
+
+// VALIDATION
+if(name=="" || cake=="" || price==""){
+alert("Please complete order first!");
+return;
+}
+
+let order = {
+name:name,
+cake:cake,
+size:size,
+price:price,
+status:status
 };
 
-let data=JSON.parse(localStorage.getItem("orders"))||[];
-data.push(o);
-localStorage.setItem("orders",JSON.stringify(data));
+let data = JSON.parse(localStorage.getItem("orders")) || [];
+data.push(order);
 
+localStorage.setItem("orders", JSON.stringify(data));
+
+alert("Order Saved!");
 showOrders();
-alert("Saved!");
 }
 
 function showOrders(){
-let data=JSON.parse(localStorage.getItem("orders"))||[];
-let html="";
-let total=0;
 
-data.forEach((o,i)=>{
+let data = JSON.parse(localStorage.getItem("orders")) || [];
+let html = "";
+let total = 0;
 
-if(o.name.toLowerCase().includes(search.value.toLowerCase())){
+for(let i=0;i<data.length;i++){
+
+let o = data[i];
 
 if(o.status=="Paid"){
-total+=Number(o.price)||0;
+total += Number(o.price);
 }
 
-html+=`
+html += `
 <div class="order">
 ${o.name} | ${o.cake} | ₱${o.price} | ${o.status}
 <br>
 <button onclick="markPaid(${i})">Paid</button>
 <button onclick="markClaim(${i})">Claimed</button>
-<button onclick="printOne(${i})">🧾</button>
 <button onclick="deleteOrder(${i})">❌</button>
 </div>`;
 }
-});
 
-orders.innerHTML=html;
-document.getElementById("total").innerText=total;
+document.getElementById("orders").innerHTML = html;
+document.getElementById("total").innerText = total;
 }
 
 function markPaid(i){
-let data=JSON.parse(localStorage.getItem("orders"))||[];
-data[i].status="Paid";
-localStorage.setItem("orders",JSON.stringify(data));
+let data = JSON.parse(localStorage.getItem("orders"));
+data[i].status = "Paid";
+localStorage.setItem("orders", JSON.stringify(data));
 showOrders();
 }
 
 function markClaim(i){
-let data=JSON.parse(localStorage.getItem("orders"))||[];
-data[i].status="Claimed";
-localStorage.setItem("orders",JSON.stringify(data));
+let data = JSON.parse(localStorage.getItem("orders"));
+data[i].status = "Claimed";
+localStorage.setItem("orders", JSON.stringify(data));
 showOrders();
 }
 
 function deleteOrder(i){
-let data=JSON.parse(localStorage.getItem("orders"))||[];
+let data = JSON.parse(localStorage.getItem("orders"));
 data.splice(i,1);
-localStorage.setItem("orders",JSON.stringify(data));
+localStorage.setItem("orders", JSON.stringify(data));
 showOrders();
-}
-
-function previewOrder(){
-let msg =
-"🎂 Zoe's Cakes\n\n"+
-name.value+"\n"+
-cake.value+"\n₱"+price.value+"\n"+
-date.value+"\nGCash: 09062070504";
-
-alert(msg);
-}
-
-function printOne(i){
-let data=JSON.parse(localStorage.getItem("orders"))||[];
-let o=data[i];
-
-let w=window.open("");
-w.document.write(`
-<h2>Zoe's Cakes</h2>
-<p>${o.name}</p>
-<p>${o.cake}</p>
-<p>₱${o.price}</p>
-<p>${o.status}</p>
-<p>GCash: 09062070504</p>
-`);
-w.print();
 }
 
 showOrders();
