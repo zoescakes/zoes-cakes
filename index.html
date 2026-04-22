@@ -27,7 +27,6 @@
 
     .box {
       background: #ffffffcc;
-      backdrop-filter: blur(5px);
       padding: 20px;
       border-radius: 15px;
       max-width: 400px;
@@ -43,33 +42,12 @@
       border: 1px solid #ffd6e8;
     }
 
-    input:focus {
-      outline: none;
-      border-color: #ff4da6;
-      box-shadow: 0 0 5px #ffc0cb;
-    }
-
     button {
       background: linear-gradient(45deg, #ff4da6, #ff85c1);
       color: white;
       border: none;
       cursor: pointer;
       font-weight: bold;
-      transition: 0.2s;
-    }
-
-    button:hover {
-      transform: scale(1.03);
-      opacity: 0.9;
-    }
-
-    h2 {
-      margin-top: 30px;
-      color: #ff4da6;
-    }
-
-    h3 {
-      color: #d63384;
     }
 
     .order {
@@ -78,16 +56,11 @@
       margin: 12px 0;
       border-radius: 12px;
       border-left: 6px solid #ff85c1;
-      box-shadow: 0 3px 10px rgba(255,105,180,0.15);
     }
 
     @media print {
       body * { visibility: hidden; }
-
-      #printSection, #printSection * {
-        visibility: visible;
-      }
-
+      #printSection, #printSection * { visibility: visible; }
       #printSection {
         position: absolute;
         left: 0;
@@ -141,6 +114,11 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// 🔢 AUTO ORDER NUMBER
+function generateOrderNo() {
+  return "ZC-" + Date.now();
+}
+
 function addOrder() {
   const name = document.getElementById("name").value;
   const cake = document.getElementById("cake").value;
@@ -154,7 +132,10 @@ function addOrder() {
     return;
   }
 
-  db.collection("orders").add({ name, cake, size, price, date, status });
+  db.collection("orders").add({
+    orderNo: generateOrderNo(), // ✅ ADDED
+    name, cake, size, price, date, status
+  });
 }
 
 function deleteOrder(id) {
@@ -167,6 +148,7 @@ function printReceipt(o) {
   section.innerHTML = `
     <center>
       <b style="font-family:'Pacifico';font-size:16px;">Zoe's Cakes 🎂</b><br>
+      ${o.orderNo}<br> <!-- ✅ ADDED -->
       ----------------------<br>
       ${o.name}<br>
       ${o.cake}<br>
@@ -203,7 +185,8 @@ db.collection("orders").onSnapshot(snapshot => {
 
     ordersDiv.innerHTML += `
       <div class="order">
-        <b>${o.name}</b><br>
+        <b>${o.orderNo}</b><br> <!-- ✅ ADDED -->
+        👤 ${o.name}<br>
         🎂 ${o.cake}<br>
         📏 ${o.size}<br>
         💵 ₱${o.price}<br>
