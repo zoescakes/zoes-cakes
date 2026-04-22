@@ -39,11 +39,11 @@
       border-left: 5px solid #ff4da6;
     }
 
-    /* 🧾 PRINT STYLE */
+    h3 { margin-top: 10px; }
+
+    /* PRINT */
     @media print {
-      body * {
-        visibility: hidden;
-      }
+      body * { visibility: hidden; }
 
       #printSection, #printSection * {
         visibility: visible;
@@ -80,12 +80,13 @@
   <button onclick="addOrder()">Submit Order</button>
 </div>
 
-<h2>Orders</h2>
-<h3>Total Income (Paid only): ₱<span id="total">0</span></h3>
+<h2>Sales</h2>
+<h3>Today: ₱<span id="daily">0</span></h3>
+<h3>This Month: ₱<span id="monthly">0</span></h3>
 
+<h2>Orders</h2>
 <div id="orders"></div>
 
-<!-- PRINT AREA -->
 <div id="printSection"></div>
 
 <script>
@@ -109,7 +110,7 @@ function addOrder() {
   const date = document.getElementById("date").value;
   const status = document.getElementById("status").value;
 
-  if (!name || !cake || !price) {
+  if (!name || !cake || !price || !date) {
     alert("Fill all fields");
     return;
   }
@@ -121,22 +122,21 @@ function deleteOrder(id) {
   db.collection("orders").doc(id).delete();
 }
 
-// 🧾 RECEIPT PRINT
 function printReceipt(o) {
   const section = document.getElementById("printSection");
 
   section.innerHTML = `
     <center>
-      <b>Zoe's Cakes</b><br>
-      ------------------------<br>
+      <b>ZOE'S CAKES 🎂</b><br>
+      ----------------------<br>
       ${o.name}<br>
       ${o.cake}<br>
       Size: ${o.size}<br>
-      ------------------------<br>
+      ----------------------<br>
       ₱${o.price}<br>
       ${o.status}<br>
       ${o.date}<br>
-      ------------------------<br>
+      ----------------------<br>
       Thank you! 💖
     </center>
   `;
@@ -147,13 +147,24 @@ function printReceipt(o) {
 db.collection("orders").onSnapshot(snapshot => {
   const ordersDiv = document.getElementById("orders");
   ordersDiv.innerHTML = "";
-  let total = 0;
+
+  let daily = 0;
+  let monthly = 0;
+
+  const today = new Date().toISOString().slice(0,10);
+  const thisMonth = today.slice(0,7);
 
   snapshot.forEach(doc => {
     const o = doc.data();
 
     if (o.status === "Paid") {
-      total += Number(o.price);
+      if (o.date === today) {
+        daily += Number(o.price);
+      }
+
+      if (o.date.startsWith(thisMonth)) {
+        monthly += Number(o.price);
+      }
     }
 
     ordersDiv.innerHTML += `
@@ -171,7 +182,8 @@ db.collection("orders").onSnapshot(snapshot => {
     `;
   });
 
-  document.getElementById("total").innerText = total;
+  document.getElementById("daily").innerText = daily;
+  document.getElementById("monthly").innerText = monthly;
 });
 </script>
 
