@@ -115,10 +115,12 @@ img {
 
 <script>
 
+// SELECT CAKE
 function selectCake(type){
     document.getElementById("cake").value = type;
 }
 
+// SAVE ORDER
 function placeOrder(){
     let order = {
         name: document.getElementById("name").value,
@@ -142,6 +144,7 @@ function placeOrder(){
     document.querySelectorAll("input").forEach(i=>i.value="");
 }
 
+// LOGIN
 function login(){
     let u = document.getElementById("user").value;
     let p = document.getElementById("pass").value;
@@ -149,11 +152,13 @@ function login(){
     if(u=="admin" && p=="1234"){
         document.getElementById("admin").style.display="block";
         showOrders();
+        alert("Login success!");
     } else {
         alert("Wrong login!");
     }
 }
 
+// SHOW ORDERS
 function showOrders(){
     let orders = JSON.parse(localStorage.getItem("orders")) || [];
     let list = "";
@@ -173,6 +178,7 @@ function showOrders(){
     document.getElementById("total").innerText = total;
 }
 
+// DELETE ORDER
 function deleteOrder(i){
     let orders = JSON.parse(localStorage.getItem("orders")) || [];
     orders.splice(i,1);
