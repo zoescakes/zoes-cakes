@@ -1,58 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Zoe's Cakes 🎂</title>
+<title>Zoe's Cakes</title>
 
 <style>
-body { font-family: Arial; background:#ffe4ec; padding:20px; }
-h1,h2 { text-align:center; color:#ff4da6; }
+body {
+    font-family: Arial;
+    background: #ffd6e7;
+    text-align: center;
+}
 
 .container {
-  max-width:420px;
-  margin:auto;
-  background:white;
-  padding:20px;
-  border-radius:15px;
-  margin-bottom:15px;
+    background: white;
+    padding: 20px;
+    margin: 20px auto;
+    width: 350px;
+    border-radius: 15px;
 }
 
-.grid {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
+h1 { color: #ff4d94; }
 
-.card { cursor:pointer; }
-.card img { width:100%; height:110px; object-fit:cover; }
-
-input, select {
-  width:100%;
-  padding:10px;
-  margin:6px 0;
+input {
+    width: 90%;
+    padding: 10px;
+    margin: 8px;
 }
 
 button {
-  width:100%;
-  padding:10px;
-  background:#ff4da6;
-  color:white;
-  border:none;
-  cursor:pointer;
+    background: #ff4d94;
+    color: white;
+    padding: 10px;
+    border: none;
+    width: 95%;
+    cursor: pointer;
 }
 
-.order {
-  background:white;
-  margin-top:10px;
-  padding:10px;
-  border-left:5px solid pink;
+img {
+    width: 100%;
+    border-radius: 10px;
+    cursor: pointer;
 }
 
-.sales {
-  font-weight:bold;
-  margin-top:10px;
+.card {
+    margin: 10px;
 }
-
-.hidden { display:none; }
 </style>
 </head>
 
@@ -60,214 +51,130 @@ button {
 
 <h1>🎂 Zoe's Cakes</h1>
 
-<!-- CUSTOMER ORDER -->
+<div class="container">
+<h2>Choose Cake</h2>
+
+<div class="card">
+<img src="drip.jpg" onclick="selectCake('Drip Cake')">
+<p>Drip Cake</p>
+</div>
+
+<div class="card">
+<img src="mini.jpg" onclick="selectCake('Mini Tiered Cake')">
+<p>Mini Tiered Cake</p>
+</div>
+
+<div class="card">
+<img src="tiered.jpg" onclick="selectCake('Tiered Cake')">
+<p>Tiered Cake</p>
+</div>
+
+<div class="card">
+<img src="cupcake.jpg" onclick="selectCake('Cake w/ Cupcakes')">
+<p>Cake w/ Cupcakes</p>
+</div>
+
+<div class="card">
+<img src="wedding.jpg" onclick="selectCake('Wedding Cake')">
+<p>Wedding Cake</p>
+</div>
+
+</div>
+
 <div class="container">
 <h2>Order Your Cake 💖</h2>
 
-<input id="c_name" placeholder="Your Name">
-<input id="c_cake" placeholder="Cake Type">
-<input id="c_size" placeholder="Size">
-<input id="c_price" placeholder="Budget / Price">
-<input id="c_date" type="date">
+<input id="name" placeholder="Your Name">
+<input id="cake" placeholder="Cake Type">
+<input id="size" placeholder="Size">
+<input id="price" placeholder="Budget / Price">
+<input id="date" type="date">
 
-<button onclick="submitCustomerOrder()">💖 Place Order</button>
+<button onclick="placeOrder()">Place Order</button>
 </div>
 
-<!-- LOGIN -->
-<div class="container" id="loginBox">
+<div class="container">
 <h2>Admin Login</h2>
+
 <input id="user" placeholder="Username">
-<input id="pass" type="password" placeholder="Password">
+<input id="pass" placeholder="Password">
+
 <button onclick="login()">Login</button>
 </div>
 
-<!-- ADMIN SYSTEM -->
-<div id="system" class="hidden">
-
-<div class="container">
-
-<input id="name" placeholder="Customer Name">
-
-<div class="grid">
-<div class="card" onclick="pick('Drip Cake')"><img src="drip.jpg"></div>
-<div class="card" onclick="pick('1 Tier Cake')"><img src="cupcake.jpg"></div>
-<div class="card" onclick="pick('Mini Tiered')"><img src="mini.jpg"></div>
-<div class="card" onclick="pick('Standard Tiered')"><img src="tiered.jpg"></div>
-<div class="card" onclick="pick('Wedding Cake')"><img src="wedding.jpg"></div>
-</div>
-
-<input id="cakeType" placeholder="Cake Type">
-<input id="size" placeholder="Size">
-<input id="price" placeholder="Price">
-<input id="date" type="date">
-
-<select id="status">
-<option>Pending</option>
-<option>Paid</option>
-<option>Claimed</option>
-</select>
-
-<button onclick="addOrder()">✨ Add Order</button>
-
-</div>
-
-<div class="container">
-
-<input id="search" placeholder="Search..." oninput="displayOrders()">
-
-<select id="filter" onchange="displayOrders()">
-<option value="All">All</option>
-<option value="Paid">Paid</option>
-<option value="Pending">Pending</option>
-<option value="Claimed">Claimed</option>
-</select>
-
-<button onclick="clearAll()">🗑 Clear All</button>
-
-<div class="sales">
-💰 Today: ₱<span id="today">0</span><br>
-💰 Monthly: ₱<span id="month">0</span>
-</div>
-
+<div id="admin" class="container" style="display:none;">
 <h2>Orders</h2>
 <div id="orders"></div>
 
-</div>
-
+<h3>Total Sales: ₱<span id="total">0</span></h3>
 </div>
 
 <script>
 
+function selectCake(type){
+    document.getElementById("cake").value = type;
+}
+
+function placeOrder(){
+    let order = {
+        name: document.getElementById("name").value,
+        cake: document.getElementById("cake").value,
+        size: document.getElementById("size").value,
+        price: document.getElementById("price").value,
+        date: document.getElementById("date").value
+    };
+
+    if(order.name=="" || order.cake==""){
+        alert("Fill all fields!");
+        return;
+    }
+
+    let orders = JSON.parse(localStorage.getItem("orders")) || [];
+    orders.push(order);
+    localStorage.setItem("orders", JSON.stringify(orders));
+
+    alert("Order Saved!");
+
+    document.querySelectorAll("input").forEach(i=>i.value="");
+}
+
 function login(){
-if(user.value==="admin" && pass.value==="1234"){
-loginBox.style.display="none";
-system.classList.remove("hidden");
-}else{
-alert("Wrong login");
-}
-}
+    let u = document.getElementById("user").value;
+    let p = document.getElementById("pass").value;
 
-let orders = JSON.parse(localStorage.getItem("orders")) || [];
-
-function submitCustomerOrder(){
-let o={
-id:"ZC-"+Date.now(),
-name:c_name.value,
-cakeType:c_cake.value,
-size:c_size.value,
-price:parseInt(c_price.value)||0,
-date:c_date.value,
-status:"Pending"
-};
-orders.push(o);
-localStorage.setItem("orders",JSON.stringify(orders));
-alert("Order submitted 💖");
-displayOrders();
+    if(u=="admin" && p=="1234"){
+        document.getElementById("admin").style.display="block";
+        showOrders();
+    } else {
+        alert("Wrong login!");
+    }
 }
 
-function pick(type){
-cakeType.value = type;
+function showOrders(){
+    let orders = JSON.parse(localStorage.getItem("orders")) || [];
+    let list = "";
+    let total = 0;
+
+    orders.forEach((o,i)=>{
+        total += Number(o.price)||0;
+
+        list += `
+        <p>
+        ${o.name} | ${o.cake} | ${o.size} | ₱${o.price} | ${o.date}
+        <button onclick="deleteOrder(${i})">❌</button>
+        </p>`;
+    });
+
+    document.getElementById("orders").innerHTML = list;
+    document.getElementById("total").innerText = total;
 }
 
-function addOrder(){
-let o={
-id:"ZC-"+Date.now(),
-name:name.value,
-cakeType:cakeType.value,
-size:size.value,
-price:parseInt(price.value),
-date:date.value,
-status:status.value
-};
-
-if(!o.name || !o.cakeType || !o.price){
-alert("Fill required fields!");
-return;
+function deleteOrder(i){
+    let orders = JSON.parse(localStorage.getItem("orders")) || [];
+    orders.splice(i,1);
+    localStorage.setItem("orders", JSON.stringify(orders));
+    showOrders();
 }
-
-orders.push(o);
-localStorage.setItem("orders",JSON.stringify(orders));
-displayOrders();
-}
-
-function deleteOrder(id){
-orders=orders.filter(o=>o.id!==id);
-localStorage.setItem("orders",JSON.stringify(orders));
-displayOrders();
-}
-
-function clearAll(){
-if(confirm("Delete all orders?")){
-orders=[];
-localStorage.removeItem("orders");
-displayOrders();
-}
-}
-
-function printOrder(o){
-let w=window.open("","","width=300,height=600");
-w.document.write(`
-<h2 style="text-align:center;">💖 Zoe's Cakes 💖</h2>
-<p>${o.id}</p>
-<p>${o.name}</p>
-<p>${o.cakeType}</p>
-<p>${o.size}</p>
-<p>₱${o.price}</p>
-<p>${o.date}</p>
-<p>${o.status}</p>
-<hr>
-<p style="text-align:center;">Thank you!</p>
-`);
-w.print();
-}
-
-function displayOrders(){
-
-let searchVal = document.getElementById("search").value.toLowerCase();
-let filterVal = document.getElementById("filter").value;
-
-let container=document.getElementById("orders");
-container.innerHTML="";
-
-let todayTotal=0;
-let monthTotal=0;
-
-let today=new Date().toISOString().split("T")[0];
-let month=new Date().getMonth();
-
-orders.forEach(o=>{
-
-if(o.name.toLowerCase().includes(searchVal)){
-if(filterVal==="All"||o.status===filterVal){
-
-if(o.status==="Paid"){
-if(o.date===today) todayTotal+=o.price;
-if(new Date(o.date).getMonth()===month) monthTotal+=o.price;
-}
-
-container.innerHTML+=`
-<div class="order">
-<b>${o.id}</b><br>
-👤 ${o.name}<br>
-🎂 ${o.cakeType}<br>
-📏 ${o.size}<br>
-💰 ₱${o.price}<br>
-📅 ${o.date}<br>
-❤️ ${o.status}<br><br>
-
-<button onclick='printOrder(${JSON.stringify(o)})'>🧾 Print</button>
-<button onclick="deleteOrder('${o.id}')">❌ Delete</button>
-</div>
-`;
-}
-}
-});
-
-document.getElementById("today").innerText=todayTotal;
-document.getElementById("month").innerText=monthTotal;
-}
-
-displayOrders();
 
 </script>
 
