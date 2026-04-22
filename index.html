@@ -6,43 +6,69 @@
 <style>
 body {
     font-family: Arial;
-    background: #ffd6e7;
-    text-align: center;
+    background: linear-gradient(to right,#ffd6e7,#ffeaf4);
+    margin:0;
 }
 
-.container {
-    background: white;
-    padding: 20px;
-    margin: 20px auto;
-    width: 350px;
-    border-radius: 15px;
+h1 {
+    text-align:center;
+    color:#ff4d94;
 }
 
-h1 { color: #ff4d94; }
-
-input {
-    width: 90%;
-    padding: 10px;
-    margin: 8px;
+.main {
+    display:flex;
+    height:95vh;
 }
 
-button {
-    background: #ff4d94;
-    color: white;
-    padding: 10px;
-    border: none;
-    width: 95%;
-    cursor: pointer;
+/* LEFT */
+.left {
+    width:40%;
+    padding:10px;
+    overflow:auto;
+}
+
+.cakes {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
 }
 
 img {
-    width: 100%;
-    border-radius: 10px;
-    cursor: pointer;
+    width:100%;
+    border-radius:15px;
+    cursor:pointer;
 }
 
-.card {
-    margin: 10px;
+/* RIGHT */
+.right {
+    width:60%;
+    padding:10px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.container {
+    background:white;
+    padding:15px;
+    border-radius:20px;
+}
+
+input, select {
+    width:95%;
+    padding:10px;
+    margin:5px;
+    border-radius:10px;
+}
+
+button {
+    width:100%;
+    padding:10px;
+    background:#ff4d94;
+    color:white;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
 }
 </style>
 </head>
@@ -51,139 +77,87 @@ img {
 
 <h1>🎂 Zoe's Cakes</h1>
 
-<!-- CAKE MENU -->
-<div class="container">
-<h2>Choose Cake</h2>
+<div class="main">
 
-<div class="card">
+<!-- LEFT -->
+<div class="left container">
+<h3>Choose Cake</h3>
+
+<div class="cakes">
 <img src="drip.jpg" onclick="selectCake('Drip Cake')">
-<p>Drip Cake</p>
-</div>
-
-<div class="card">
-<img src="mini.jpg" onclick="selectCake('Mini Tiered Cake')">
-<p>Mini Tiered Cake</p>
-</div>
-
-<div class="card">
+<img src="mini.jpg" onclick="selectCake('Mini Tiered')">
 <img src="tiered.jpg" onclick="selectCake('Tiered Cake')">
-<p>Tiered Cake</p>
-</div>
-
-<div class="card">
-<img src="cupcake.jpg" onclick="selectCake('Cake w/ Cupcakes')">
-<p>Cake w/ Cupcakes</p>
-</div>
-
-<div class="card">
+<img src="cupcake.jpg" onclick="selectCake('With Cupcakes')">
 <img src="wedding.jpg" onclick="selectCake('Wedding Cake')">
-<p>Wedding Cake</p>
+</div>
 </div>
 
-</div>
+<!-- RIGHT -->
+<div class="right">
 
-<!-- ORDER FORM -->
 <div class="container">
-<h2>Order Your Cake 💖</h2>
+<h3>Order Now 💖</h3>
 
 <input id="name" placeholder="Your Name">
-<input id="cake" placeholder="Cake Type">
-<input id="size" placeholder="Size">
-<input id="price" placeholder="Budget / Price">
+<input id="cake" placeholder="Cake Type" readonly>
+
+<select id="size" onchange="autoPrice()">
+<option value="">Size</option>
+<option>Small</option>
+<option>Medium</option>
+<option>Large</option>
+</select>
+
+<input id="price" placeholder="Price" readonly>
 <input id="date" type="date">
 
-<button onclick="placeOrder()">Place Order</button>
+<h4>GCash Payment</h4>
+<p>Send to: <b>09062070504</b></p>
+
+<button onclick="sendOrder()">Submit Order</button>
 </div>
 
-<!-- ADMIN LOGIN -->
-<div class="container">
-<h2>Admin Login</h2>
-
-<input id="user" placeholder="Username">
-<input id="pass" placeholder="Password">
-
-<button onclick="login()">Login</button>
 </div>
-
-<!-- ADMIN PANEL -->
-<div id="admin" class="container" style="display:none;">
-<h2>Orders</h2>
-<div id="orders"></div>
-
-<h3>Total Sales: ₱<span id="total">0</span></h3>
 </div>
 
 <script>
 
-// SELECT CAKE
 function selectCake(type){
-    document.getElementById("cake").value = type;
+cake.value = type;
+autoPrice();
 }
 
-// SAVE ORDER
-function placeOrder(){
-    let order = {
-        name: document.getElementById("name").value,
-        cake: document.getElementById("cake").value,
-        size: document.getElementById("size").value,
-        price: document.getElementById("price").value,
-        date: document.getElementById("date").value
-    };
+function autoPrice(){
+let p=0;
 
-    if(order.name=="" || order.cake==""){
-        alert("Fill all fields!");
-        return;
-    }
-
-    let orders = JSON.parse(localStorage.getItem("orders")) || [];
-    orders.push(order);
-    localStorage.setItem("orders", JSON.stringify(orders));
-
-    alert("Order Saved!");
-
-    document.querySelectorAll("input").forEach(i=>i.value="");
+if(cake.value=="Drip Cake"){
+if(size.value=="Small") p=380;
+if(size.value=="Medium") p=580;
+if(size.value=="Large") p=700;
 }
 
-// LOGIN
-function login(){
-    let u = document.getElementById("user").value;
-    let p = document.getElementById("pass").value;
+if(cake.value=="With Cupcakes") p=1350;
+if(cake.value=="Mini Tiered") p=2350;
+if(cake.value=="Tiered Cake") p=2800;
+if(cake.value=="Wedding Cake") p=3500;
 
-    if(u=="admin" && p=="1234"){
-        document.getElementById("admin").style.display="block";
-        showOrders();
-        alert("Login success!");
-    } else {
-        alert("Wrong login!");
-    }
+price.value = p;
 }
 
-// SHOW ORDERS
-function showOrders(){
-    let orders = JSON.parse(localStorage.getItem("orders")) || [];
-    let list = "";
-    let total = 0;
+function sendOrder(){
+let message = `
+Order from Zoe's Cakes
 
-    orders.forEach((o,i)=>{
-        total += Number(o.price)||0;
+Name: ${name.value}
+Cake: ${cake.value}
+Size: ${size.value}
+Price: ₱${price.value}
+Date: ${date.value}
 
-        list += `
-        <p>
-        ${o.name} | ${o.cake} | ${o.size} | ₱${o.price} | ${o.date}
-        <button onclick="deleteOrder(${i})">❌</button>
-        </p>`;
-    });
+GCash: 09764183834
+`;
 
-    document.getElementById("orders").innerHTML = list;
-    document.getElementById("total").innerText = total;
-}
-
-// DELETE ORDER
-function deleteOrder(i){
-    let orders = JSON.parse(localStorage.getItem("orders")) || [];
-    orders.splice(i,1);
-    localStorage.setItem("orders", JSON.stringify(orders));
-    showOrders();
+window.location.href = "mailto:cacalimpong@gmail.com?subject=Cake Order&body=" + encodeURIComponent(message);
 }
 
 </script>
