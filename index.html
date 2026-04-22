@@ -112,7 +112,7 @@ button {
 <input id="date" type="date">
 
 <h4>GCash Payment</h4>
-<p>Send to: <b>09062070504</b></p>
+<p>Send to: <b>09764183834</b></p>
 
 <button onclick="sendOrder()">Submit Order</button>
 </div>
@@ -123,41 +123,46 @@ button {
 <script>
 
 function selectCake(type){
-cake.value = type;
-autoPrice();
+    document.getElementById("cake").value = type;
+    autoPrice();
 }
 
 function autoPrice(){
-let p=0;
+    let cake = document.getElementById("cake").value;
+    let size = document.getElementById("size").value;
+    let p = 0;
 
-if(cake.value=="Drip Cake"){
-if(size.value=="Small") p=380;
-if(size.value=="Medium") p=580;
-if(size.value=="Large") p=700;
-}
+    if(cake=="Drip Cake"){
+        if(size=="Small") p=380;
+        if(size=="Medium") p=580;
+        if(size=="Large") p=700;
+    }
 
-if(cake.value=="With Cupcakes") p=1350;
-if(cake.value=="Mini Tiered") p=2350;
-if(cake.value=="Tiered Cake") p=2800;
-if(cake.value=="Wedding Cake") p=3500;
+    if(cake=="With Cupcakes") p=1350;
+    if(cake=="Mini Tiered") p=2350;
+    if(cake=="Tiered Cake") p=2800;
+    if(cake=="Wedding Cake") p=3500;
 
-price.value = p;
+    document.getElementById("price").value = p;
 }
 
 function sendOrder(){
-let message = `
-Order from Zoe's Cakes
+    let name = document.getElementById("name").value;
+    let cake = document.getElementById("cake").value;
+    let size = document.getElementById("size").value;
+    let price = document.getElementById("price").value;
+    let date = document.getElementById("date").value;
 
-Name: ${name.value}
-Cake: ${cake.value}
-Size: ${size.value}
-Price: ₱${price.value}
-Date: ${date.value}
+    let message =
+    "🎂 Zoe's Cakes Order\n\n" +
+    "Name: " + name + "\n" +
+    "Cake: " + cake + "\n" +
+    "Size: " + size + "\n" +
+    "Price: ₱" + price + "\n" +
+    "Date: " + date + "\n\n" +
+    "GCash: 09764183834";
 
-GCash: 09764183834
-`;
-
-window.location.href = "mailto:cacalimpong@gmail.com?subject=Cake Order&body=" + encodeURIComponent(message);
+    alert(message + "\n\n📌 Please screenshot or copy and send via Messenger.");
 }
 
 </script>
