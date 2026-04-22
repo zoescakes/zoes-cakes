@@ -10,13 +10,13 @@
   <style>
     body {
       font-family: Arial;
-      background: #fff0f5;
+      background: #ffe4ec;
       padding: 20px;
     }
 
     h1 {
       text-align: center;
-      color: #ff69b4;
+      color: #ff4da6;
     }
 
     .box {
@@ -35,17 +35,23 @@
     }
 
     button {
-      background: #ff69b4;
+      background: #ff4da6;
       color: white;
       border: none;
       cursor: pointer;
     }
 
+    h2, h3 {
+      margin-top: 20px;
+    }
+
     .order {
       background: white;
-      padding: 10px;
-      margin: 10px;
-      border-radius: 8px;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border-left: 5px solid #ff4da6;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
   </style>
 </head>
@@ -71,6 +77,8 @@
 </div>
 
 <h2>Orders</h2>
+<h3>Total Income (Paid only): ₱<span id="total">0</span></h3>
+
 <div id="orders"></div>
 
 <script>
@@ -94,8 +102,8 @@
     const date = document.getElementById("date").value;
     const status = document.getElementById("status").value;
 
-    if (!name || !cake) {
-      alert("Fill all fields");
+    if (!name || !cake || !price) {
+      alert("Please fill all important fields");
       return;
     }
 
@@ -112,10 +120,12 @@
     const w = window.open('', '', 'width=300,height=400');
     w.document.write(`
       <h3>Zoe's Cakes</h3>
-      <p>${o.name}</p>
-      <p>${o.cake}</p>
-      <p>₱${o.price}</p>
-      <p>${o.status}</p>
+      <p>Name: ${o.name}</p>
+      <p>Cake: ${o.cake}</p>
+      <p>Size: ${o.size}</p>
+      <p>Price: ₱${o.price}</p>
+      <p>Status: ${o.status}</p>
+      <p>Date: ${o.date}</p>
     `);
     w.print();
   }
@@ -123,17 +133,31 @@
   db.collection("orders").onSnapshot(snapshot => {
     const ordersDiv = document.getElementById("orders");
     ordersDiv.innerHTML = "";
+    let total = 0;
 
     snapshot.forEach(doc => {
       const o = doc.data();
+
+      if (o.status === "Paid") {
+        total += Number(o.price);
+      }
+
       ordersDiv.innerHTML += `
         <div class="order">
-          ${o.name} - ${o.cake} - ₱${o.price} (${o.status})<br>
-          <button onclick="printOrder(${JSON.stringify(o)})">Print</button>
-          <button onclick="deleteOrder('${doc.id}')">Delete</button>
+          <b>${o.name}</b><br>
+          Cake: ${o.cake}<br>
+          Size: ${o.size}<br>
+          Price: ₱${o.price}<br>
+          Date: ${o.date}<br>
+          Status: <b>${o.status}</b><br><br>
+
+          <button onclick="printOrder(${JSON.stringify(o)})">🧾 Print</button>
+          <button onclick="deleteOrder('${doc.id}')">❌ Delete</button>
         </div>
       `;
     });
+
+    document.getElementById("total").innerText = total;
   });
 </script>
 
