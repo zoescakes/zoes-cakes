@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Zoe's Cakes 🎂</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #ffe4ec, #ffd6e7);
+      padding: 20px;
+    }
+
+    h1 {
+      font-family: 'Pacifico', cursive;
+      text-align: center;
+      color: #ff4da6;
+      font-size: 40px;
+    }
+
+    .logo {
+      display: block;
+      margin: 0 auto;
+      width: 120px;
+    }
+
+    .box {
+      background: white;
+      padding: 20px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin: 6px 0;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+    }
+
+    button {
+      background: linear-gradient(to right, #ff4da6, #ff85c1);
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .del { background: red; }
+
+    .income {
+      font-size: 26px;
+      font-weight: bold;
+      text-align: center;
+      color: #28a745;
+    }
+
+    #app { display:none; }
+  </style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div class="box" id="loginBox">
+  <h2>🔐 Login</h2>
+  <input type="password" id="password" placeholder="Enter Password">
+  <button onclick="login()">Login</button>
+</div>
+
+<!-- MAIN -->
+<div id="app">
+
+<img src="logo.png" class="logo">
+<h1>Zoe's Cakes 🎂</h1>
+
+<div class="box">
+  <h2>Order Cake</h2>
+  <input id="name" placeholder="Customer Name">
+  <input id="cake" placeholder="Cake Type">
+  <input id="size" placeholder="Size">
+  <input id="price" placeholder="Price">
+  <input id="delivery" placeholder="Delivery Fee">
+  <input type="date" id="date">
+
+  <select id="status">
+    <option>Pending</option>
+    <option>In Progress</option>
+    <option>Done</option>
+    <option>Delivered</option>
+  </select>
+
+  <button onclick="addOrder()">Submit Order</button>
+</div>
+
+<div class="box">
+  <h2>🔍 Search / Filter</h2>
+  <input id="search" placeholder="Search name or cake" oninput="loadOrders()">
+  <input type="date" id="filterDate" onchange="loadOrders()">
+</div>
+
+<div class="box">
+  <h2>💰 Total Income</h2>
+  <div id="income" class="income">₱0</div>
+</div>
+
+<div class="box">
+  <h2>Orders</h2>
+  <div id="orders"></div>
+</div>
+
+</div>
+
+<script>
+// LOGIN
+const correctPassword = "1234";
+function login() {
+  if(document.getElementById("password").value === correctPassword) {
+    document.getElementById("loginBox").style.display="none";
+    document.getElementById("app").style.display="block";
+  } else {
+    alert("Wrong password");
+  }
+}
+
+// FIREBASE
+const firebaseConfig = {
+  apiKey: "PASTE_YOUR_API_KEY_HERE",
+  authDomain: "zoes-cake-order-tracker.firebaseapp.com",
+  projectId: "zoes-cake-order-tracker"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// ADD
+function addOrder() {
+  db.collection("orders").add({
+    name: name.value,
+    cake: cake.value,
+    size: size.value,
+    price: price.value,
+    delivery: delivery.value,
+    date: date.value,
+    status: status.value
+  });
+}
+
+// DELETE
+function deleteOrder(id) {
+  if(confirm("Delete?")) db.collection("orders").doc(id).delete();
+}
+
+// LOAD
+function loadOrders() {
+  const search = document.getElementById("search").value.toLowerCase();
+  const filterDate = document.getElementById("filterDate").value;
+
+  db.collection("orders").onSnapshot(snap => {
+    let html = "";
+    let totalIncome = 0;
+
+    snap.forEach(doc => {
+      const o = doc.data();
+      const id = doc.id;
+
+      if(
+        (o.name.toLowerCase().includes(search) || o.cake.toLowerCase().includes(search)) &&
+        (!filterDate || o.date === filterDate)
+      ){
+        const total = Number(o.price)+Number(o.delivery);
+        totalIncome += total;
+
+        html += `
+        <div style="padding:10px;border-bottom:1px solid #ccc;">
+          <b>${o.name}</b> - ${o.cake} (${o.size})<br>
+          ₱${o.price}+₱${o.delivery}=<b>₱${total}</b><br>
+          ${o.status} | ${o.date}<br><br>
+
+          <button onclick="printReceipt('${o.name}','${o.cake}','${o.size}','${o.price}','${o.delivery}','${o.date}','${o.status}')">Print</button>
+          <button class="del" onclick="deleteOrder('${id}')">Delete</button>
+        </div>`;
+      }
+    });
+
+    orders.innerHTML = html;
+    income.innerText = "₱"+totalIncome;
+  });
+}
+loadOrders();
+
+// PRINT
+function printReceipt(n,c,s,p,d,dt,st){
+  const w=window.open('','','width=400,height=600');
+  w.document.write(`
+    <div style="text-align:center;">
+      <img src="logo.png" style="width:100px;"><br>
+      <h2>Zoe's Cakes 🎂</h2>
+    </div>
+    <hr>
+    <p>${n}</p>
+    <p>${c} (${s})</p>
+    <p>₱${p} + ₱${d}</p>
+    <p><b>Total: ₱${Number(p)+Number(d)}</b></p>
+    <p>${dt}</p>
+    <p>${st}</p>
+    <hr>
+  `);
+  w.print();
+}
+</script>
+
+</body>
+</html>
