@@ -8,7 +8,7 @@ body { font-family: Arial; background: #ffe4ec; padding: 20px; }
 h1 { text-align: center; color: #ff4da6; }
 
 .container {
-  max-width: 400px;
+  max-width: 420px;
   margin: auto;
   background: white;
   padding: 20px;
@@ -19,12 +19,11 @@ h1 { text-align: center; color: #ff4da6; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin-bottom: 15px;
 }
 
 .card {
   background: #fff;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
   border: 2px solid transparent;
@@ -36,7 +35,7 @@ h1 { text-align: center; color: #ff4da6; }
 
 .card img {
   width: 100%;
-  height: 100px;
+  height: 110px;
   object-fit: cover;
 }
 
@@ -49,7 +48,7 @@ h1 { text-align: center; color: #ff4da6; }
 input, select {
   width: 100%;
   padding: 10px;
-  margin: 5px 0;
+  margin: 6px 0;
 }
 
 button {
@@ -59,6 +58,7 @@ button {
   color: white;
   border: none;
   cursor: pointer;
+  margin-top:5px;
 }
 
 .order {
@@ -67,8 +67,12 @@ button {
   padding: 10px;
   border-left: 5px solid pink;
 }
-</style>
 
+.sales {
+  margin-top:20px;
+  font-weight:bold;
+}
+</style>
 </head>
 
 <body>
@@ -79,42 +83,47 @@ button {
 
 <input id="name" placeholder="Customer Name">
 
-<!-- 🎂 CLICKABLE THEMED MENU -->
+<!-- 🎂 MENU -->
 <div class="grid">
 
 <div class="card" onclick="pick('small')">
-<img src="https://images.unsplash.com/photo-1603532648955-039310d9ed75">
+<img src="images/drip.jpg">
 <p>Drip Small ₱380</p>
 </div>
 
 <div class="card" onclick="pick('medium')">
-<img src="https://images.unsplash.com/photo-1559622214-7d0c4c43dcae">
+<img src="images/drip.jpg">
 <p>Drip Medium ₱580</p>
 </div>
 
 <div class="card" onclick="pick('large')">
-<img src="https://images.unsplash.com/photo-1601972599720-bb9f0a9d3a1e">
+<img src="images/drip.jpg">
 <p>Drip Large ₱700</p>
 </div>
 
 <div class="card" onclick="pick('rect')">
-<img src="https://images.unsplash.com/photo-1621303837174-89787a7d4729">
-<p>Rectangular ₱850</p>
+<img src="images/rect.jpg">
+<p>Rect ₱850</p>
 </div>
 
 <div class="card" onclick="pick('pkg1')">
-<img src="https://images.unsplash.com/photo-1614707267537-b85aaf00c4b7">
-<p>1 Tier + Cupcake ₱1350</p>
+<img src="images/cupcake.jpg">
+<p>1 Tier ₱1350</p>
 </div>
 
 <div class="card" onclick="pick('pkg2')">
-<img src="https://images.unsplash.com/photo-1599785209707-28c4a0d8f5a0">
-<p>Mini Tiered ₱2350</p>
+<img src="images/mini.jpg">
+<p>Mini Tier ₱2350</p>
 </div>
 
 <div class="card" onclick="pick('pkg3')">
-<img src="https://images.unsplash.com/photo-1627308595229-7830a5c91f9f">
-<p>Standard Tier ₱2800</p>
+<img src="images/tiered.jpg">
+<p>Standard ₱2800</p>
+</div>
+
+<div class="card" onclick="pick('wedding')">
+<img src="images/wedding.jpg">
+<p>Wedding ₱3500</p>
 </div>
 
 </div>
@@ -135,6 +144,11 @@ button {
 
 </div>
 
+<div class="sales">
+💰 Today Sales: ₱<span id="today">0</span><br>
+💰 Monthly Sales: ₱<span id="month">0</span>
+</div>
+
 <h2>🧁 Orders</h2>
 <div id="orders"></div>
 
@@ -142,84 +156,74 @@ button {
 
 let orders = JSON.parse(localStorage.getItem("orders")) || [];
 
-// 🎂 PICK PACKAGE
-function pick(pkg) {
+function pick(pkg){
 
-if (pkg === "small") {
-cakeType.value = "Drip Cake";
-size.value = "Small";
-price.value = "380";
-}
-
-if (pkg === "medium") {
-cakeType.value = "Drip Cake";
-size.value = "Medium";
-price.value = "580";
-}
-
-if (pkg === "large") {
-cakeType.value = "Drip Cake";
-size.value = "Large";
-price.value = "700";
-}
-
-if (pkg === "rect") {
-cakeType.value = "Rectangular Cake";
-size.value = "8x12";
-price.value = "850";
-}
-
-if (pkg === "pkg1") {
-cakeType.value = "1 Tier + 12 Cupcakes";
-size.value = "6x4";
-price.value = "1350";
-}
-
-if (pkg === "pkg2") {
-cakeType.value = "Mini Tiered + 12 Cupcakes";
-size.value = "7 & 5";
-price.value = "2350";
-}
-
-if (pkg === "pkg3") {
-cakeType.value = "Standard Tiered + 12 Cupcakes";
-size.value = "8 & 6";
-price.value = "2800";
-}
+if(pkg==="small"){cakeType.value="Drip Cake";size.value="Small";price.value="380";}
+if(pkg==="medium"){cakeType.value="Drip Cake";size.value="Medium";price.value="580";}
+if(pkg==="large"){cakeType.value="Drip Cake";size.value="Large";price.value="700";}
+if(pkg==="rect"){cakeType.value="Rectangular";size.value="8x12";price.value="850";}
+if(pkg==="pkg1"){cakeType.value="1 Tier + 12 Cupcakes";size.value="6x4";price.value="1350";}
+if(pkg==="pkg2"){cakeType.value="Mini Tiered";size.value="7 & 5";price.value="2350";}
+if(pkg==="pkg3"){cakeType.value="Standard Tiered";size.value="8 & 6";price.value="2800";}
+if(pkg==="wedding"){cakeType.value="Wedding Cake";size.value="2 Tier";price.value="3500";}
 
 }
 
-// ➕ ADD ORDER
-function addOrder() {
-const order = {
-id: "ZC-" + Date.now(),
-name: name.value,
-cakeType: cakeType.value,
-size: size.value,
-price: parseInt(price.value),
-date: date.value,
-status: status.value
+function addOrder(){
+const order={
+id:"ZC-"+Date.now(),
+name:name.value,
+cakeType:cakeType.value,
+size:size.value,
+price:parseInt(price.value),
+date:date.value,
+status:status.value
 };
 
 orders.push(order);
-localStorage.setItem("orders", JSON.stringify(orders));
+localStorage.setItem("orders",JSON.stringify(orders));
 displayOrders();
 }
 
-// ❌ DELETE
-function deleteOrder(id) {
-orders = orders.filter(o => o.id !== id);
-localStorage.setItem("orders", JSON.stringify(orders));
+function deleteOrder(id){
+orders=orders.filter(o=>o.id!==id);
+localStorage.setItem("orders",JSON.stringify(orders));
 displayOrders();
 }
 
-// 📦 DISPLAY
-function displayOrders() {
-const container = document.getElementById("orders");
-container.innerHTML = "";
+function printOrder(o){
+let w=window.open("","","width=300,height=600");
+w.document.write(`
+<h3 style="text-align:center;">🎂 Zoe's Cakes</h3>
+<p>${o.id}</p>
+<p>${o.name}</p>
+<p>${o.cakeType}</p>
+<p>${o.size}</p>
+<p>₱${o.price}</p>
+<p>${o.date}</p>
+<p>${o.status}</p>
+`);
+w.print();
+}
 
-orders.forEach(o => {
-container.innerHTML += `
+function displayOrders(){
+const container=document.getElementById("orders");
+container.innerHTML="";
+
+let todayTotal=0;
+let monthTotal=0;
+
+const today=new Date().toISOString().split("T")[0];
+const month=new Date().getMonth();
+
+orders.forEach(o=>{
+
+if(o.status==="Paid"){
+if(o.date===today) todayTotal+=o.price;
+if(new Date(o.date).getMonth()===month) monthTotal+=o.price;
+}
+
+container.innerHTML+=`
 <div class="order">
 <b>${o.id}</b><br>
 👤 ${o.name}<br>
@@ -229,10 +233,14 @@ container.innerHTML += `
 📅 ${o.date}<br>
 ❤️ ${o.status}<br><br>
 
+<button onclick='printOrder(${JSON.stringify(o)})'>🧾 Print</button>
 <button onclick='deleteOrder("${o.id}")'>❌ Delete</button>
 </div>
 `;
 });
+
+document.getElementById("today").innerText=todayTotal;
+document.getElementById("month").innerText=monthTotal;
 }
 
 displayOrders();
