@@ -98,21 +98,20 @@ function deleteOrder(id) {
   db.collection("orders").doc(id).delete();
 }
 
-// ✅ FIXED PRINT (no popup block issue)
-function printOrder(o) {
-  const content = `
-    Zoe's Cakes
-    -------------------
-    Name: ${o.name}
-    Cake: ${o.cake}
-    Size: ${o.size}
-    Price: ₱${o.price}
-    Status: ${o.status}
-    Date: ${o.date}
-  `;
-  const printWindow = window.open('', '_blank');
-  printWindow.document.write("<pre>" + content + "</pre>");
-  printWindow.print();
+// ✅ NEW PRINT (SURE CLICK WORK)
+function printOrder(name, cake, size, price, status, date) {
+  const w = window.open('', '', 'width=300,height=400');
+  w.document.write(`
+    <h3>Zoe's Cakes</h3>
+    <p>Name: ${name}</p>
+    <p>Cake: ${cake}</p>
+    <p>Size: ${size}</p>
+    <p>Price: ₱${price}</p>
+    <p>Status: ${status}</p>
+    <p>Date: ${date}</p>
+  `);
+  w.document.close();
+  w.print();
 }
 
 db.collection("orders").onSnapshot(snapshot => {
@@ -136,7 +135,7 @@ db.collection("orders").onSnapshot(snapshot => {
         Date: ${o.date}<br>
         Status: <b>${o.status}</b><br><br>
 
-        <button onclick='printOrder(${JSON.stringify(o)})'>🧾 Print</button>
+        <button onclick="printOrder('${o.name}','${o.cake}','${o.size}','${o.price}','${o.status}','${o.date}')">🧾 Print</button>
         <button onclick="deleteOrder('${doc.id}')">❌ Delete</button>
       </div>
     `;
