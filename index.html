@@ -3,45 +3,84 @@
 <head>
   <title>Zoe's Cakes 🎂</title>
 
+  <!-- Cute Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
   <style>
-    body { font-family: Arial; background: #ffe4ec; padding: 20px; }
-    h1 { text-align: center; color: #ff4da6; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom, #ffe4ec, #fff0f5);
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #ff4da6;
+      font-family: 'Pacifico', cursive;
+      font-size: 42px;
+      text-shadow: 1px 1px 3px #ffc0cb;
+    }
 
     .box {
-      background: white;
+      background: #ffffffcc;
+      backdrop-filter: blur(5px);
       padding: 20px;
-      border-radius: 10px;
+      border-radius: 15px;
       max-width: 400px;
       margin: auto;
+      box-shadow: 0 4px 15px rgba(255,105,180,0.2);
     }
 
     input, select, button {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid #ffd6e8;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #ff4da6;
+      box-shadow: 0 0 5px #ffc0cb;
     }
 
     button {
-      background: #ff4da6;
+      background: linear-gradient(45deg, #ff4da6, #ff85c1);
       color: white;
       border: none;
       cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      transform: scale(1.03);
+      opacity: 0.9;
+    }
+
+    h2 {
+      margin-top: 30px;
+      color: #ff4da6;
+    }
+
+    h3 {
+      color: #d63384;
     }
 
     .order {
-      background: white;
+      background: #fff;
       padding: 15px;
-      margin: 10px 0;
-      border-radius: 10px;
-      border-left: 5px solid #ff4da6;
+      margin: 12px 0;
+      border-radius: 12px;
+      border-left: 6px solid #ff85c1;
+      box-shadow: 0 3px 10px rgba(255,105,180,0.15);
     }
 
-    h3 { margin-top: 10px; }
-
-    /* PRINT */
     @media print {
       body * { visibility: hidden; }
 
@@ -62,7 +101,7 @@
 
 <body>
 
-<h1>Zoe's Cake Orders 🎂</h1>
+<h1>Zoe's Cakes 🎂</h1>
 
 <div class="box">
   <input id="name" placeholder="Customer Name">
@@ -77,14 +116,14 @@
     <option>Claimed</option>
   </select>
 
-  <button onclick="addOrder()">Submit Order</button>
+  <button onclick="addOrder()">✨ Submit Order</button>
 </div>
 
-<h2>Sales</h2>
+<h2>💰 Sales</h2>
 <h3>Today: ₱<span id="daily">0</span></h3>
 <h3>This Month: ₱<span id="monthly">0</span></h3>
 
-<h2>Orders</h2>
+<h2>🧁 Orders</h2>
 <div id="orders"></div>
 
 <div id="printSection"></div>
@@ -127,7 +166,7 @@ function printReceipt(o) {
 
   section.innerHTML = `
     <center>
-      <b>ZOE'S CAKES 🎂</b><br>
+      <b style="font-family:'Pacifico';font-size:16px;">Zoe's Cakes 🎂</b><br>
       ----------------------<br>
       ${o.name}<br>
       ${o.cake}<br>
@@ -158,23 +197,18 @@ db.collection("orders").onSnapshot(snapshot => {
     const o = doc.data();
 
     if (o.status === "Paid") {
-      if (o.date === today) {
-        daily += Number(o.price);
-      }
-
-      if (o.date.startsWith(thisMonth)) {
-        monthly += Number(o.price);
-      }
+      if (o.date === today) daily += Number(o.price);
+      if (o.date.startsWith(thisMonth)) monthly += Number(o.price);
     }
 
     ordersDiv.innerHTML += `
       <div class="order">
         <b>${o.name}</b><br>
-        Cake: ${o.cake}<br>
-        Size: ${o.size}<br>
-        Price: ₱${o.price}<br>
-        Date: ${o.date}<br>
-        Status: <b>${o.status}</b><br><br>
+        🎂 ${o.cake}<br>
+        📏 ${o.size}<br>
+        💵 ₱${o.price}<br>
+        📅 ${o.date}<br>
+        💖 <b>${o.status}</b><br><br>
 
         <button onclick='printReceipt(${JSON.stringify(o)})'>🧾 Print</button>
         <button onclick="deleteOrder('${doc.id}')">❌ Delete</button>
