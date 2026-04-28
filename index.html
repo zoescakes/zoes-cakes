@@ -233,19 +233,37 @@ db.collection("orders").doc(id).update({status:val});
 
 // PRINT RECEIPT
 function printRec(o){
+
 let html=`
-<h2 style="text-align:center;color:#ff4d94">Zoe's Cakes 💖</h2>
+<div style="font-family:Arial;padding:20px">
+
+<div style="text-align:center">
+<img src="./logo.png" width="80" style="border-radius:50%">
+<h2 style="color:#ff4d94;margin:5px">Zoe's Cakes 💖</h2>
+<p>📍 Poblacion,Sawata Davao del Norte Philippines</p>
+<p>📞 09062070504</p>
+</div>
+
 <hr>
-<p><b>Name:</b> ${o.name}</p>
-<p><b>Cake:</b> ${o.cake}</p>
-<p><b>Size:</b> ${o.size}</p>
-<p><b>Price:</b> ₱${o.price}</p>
-<p><b>Date:</b> ${o.date}</p>
+
+<p><b>👤 Name:</b> ${o.name}</p>
+<p><b>🎂 Cake:</b> ${o.cake}</p>
+<p><b>📏 Size:</b> ${o.size}</p>
+<p><b>💸 Price:</b> ₱${o.price}</p>
+<p><b>📅 Date:</b> ${o.date}</p>
+
 <hr>
-<p style="text-align:center">Thank you! 💖</p>
+
+<p style="text-align:center;color:#ff4d94">
+💖 Thank you for your order! 💖
+</p>
+
+</div>
 `;
+
 document.getElementById("printArea").innerHTML=html;
 window.print();
+
 }
 
 // LOAD
