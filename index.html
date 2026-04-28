@@ -235,28 +235,25 @@ db.collection("orders").doc(id).update({status:val});
 function printRec(o){
 
 let html=`
-<div style="font-family:Arial;padding:20px">
+<div style="font-family:monospace; width:250px; padding:10px">
 
-<div style="text-align:center">
-<img src="./logo.png" width="80" style="border-radius:50%">
-<h2 style="color:#ff4d94;margin:5px">Zoe's Cakes 💖</h2>
-<p>📍 Poblacion,Sawata Davao del Norte Philippines</p>
-<p>📞 09062070504</p>
-</div>
+<center>
+<h3>Zoe's Cakes</h3>
+Obrero, Philippines<br>
+09764183834
+</center>
 
-<hr>
+--------------------------------
 
-<p><b>👤 Name:</b> ${o.name}</p>
-<p><b>🎂 Cake:</b> ${o.cake}</p>
-<p><b>📏 Size:</b> ${o.size}</p>
-<p><b>💸 Price:</b> ₱${o.price}</p>
-<p><b>📅 Date:</b> ${o.date}</p>
+Name: ${o.name}
+Cake: ${o.cake}
+Size: ${o.size}
+Price: ₱${o.price}
+Date: ${o.date}
 
-<hr>
+--------------------------------
 
-<p style="text-align:center;color:#ff4d94">
-💖 Thank you for your order! 💖
-</p>
+     Thank you! 💖
 
 </div>
 `;
@@ -265,7 +262,6 @@ document.getElementById("printArea").innerHTML=html;
 window.print();
 
 }
-
 // LOAD
 function load(){
 db.collection("orders").onSnapshot(snap=>{
