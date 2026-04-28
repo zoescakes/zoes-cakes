@@ -127,28 +127,23 @@ border-radius:10px;
 
 <script>
 
-function selectCake(type){
-document.getElementById("cake").value = type;
-autoPrice();
-}
+function selectCake(cake){
 
-function autoPrice(){
-let cake = document.getElementById("cake").value;
-let size = document.getElementById("size").value;
-let p = 0;
+// remove highlight
+document.querySelectorAll(".product").forEach(p=>{
+p.classList.remove("active");
+});
 
-if(cake=="Drip Cake"){
-if(size=="Small") p=380;
-if(size=="Medium") p=580;
-if(size=="Large") p=700;
-}
+// highlight selected
+event.currentTarget.closest(".product").classList.add("active");
 
-if(cake=="With Cupcakes") p=1350;
-if(cake=="Mini Tiered") p=2350;
-if(cake=="Tiered Cake") p=2800;
-if(cake=="Wedding Cake") p=3500;
+// fill cake name only
+document.getElementById("cake").value = cake;
 
-document.getElementById("price").value = p;
+// CLEAR price & size (ikaw na magbutang)
+document.getElementById("price").value = "";
+document.getElementById("size").value = "";
+
 }
 
 function saveOrder(){
