@@ -1,9 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Zoe's Cakes</title>
+<meta charset="UTF-8">
+<title>Zoe's Cakes 👑</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <style>
+body{font-family:Arial;background:#ffe6f0;margin:0}
+h1{text-align:center;color:#ff4d94}
+
+.main{display:flex}
+.left{width:60%;padding:10px}
+.right{width:40%;padding:10px;background:#fff0f5}
+
+/* PRODUCTS */
 .cakes{
 display:grid;
 grid-template-columns:repeat(3,1fr);
@@ -18,7 +30,9 @@ text-align:center;
 position:relative;
 box-shadow:0 8px 20px rgba(255,77,148,0.2);
 cursor:pointer;
+transition:0.3s;
 }
+.product:hover{transform:scale(1.05)}
 
 .product img{
 width:100%;
@@ -38,106 +52,106 @@ border-radius:10px;
 font-size:12px;
 }
 
-.product:hover{
-transform:scale(1.05);
+.product.active{
+border:2px solid #ff4d94;
+box-shadow:0 0 10px #ff4d94;
 }
-body { font-family: Dancing moon script; background:#ffd6e7; margin:0; }
-h1 { text-align:center; color:#ff4d94; }
 
-.main { display:flex; height:95vh; }
-
-.left { width:40%; padding:10px; overflow:auto; }
-.right { width:60%; padding:10px; display:flex; flex-direction:column; gap:10px; }
-
-.container { background:white; padding:15px; border-radius:20px; }
-
-.cakes { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-
-img { width:100%; border-radius:15px; cursor:pointer; }
-
-input, select {
-width:95%;
+/* FORM */
+input,select{
+width:90%;
 padding:10px;
 margin:5px;
-border-radius:10px;
+border-radius:8px;
+border:1px solid #ccc;
 }
 
-button {
-padding:8px;
-margin:3px;
+button{
+padding:10px;
 background:#ff4d94;
 color:white;
 border:none;
-border-radius:10px;
+border-radius:8px;
+margin:5px;
 cursor:pointer;
 }
 
-.order {
-background:#fff0f5;
-padding:8px;
+/* ORDERS */
+.order{
+background:white;
 margin:5px;
+padding:10px;
 border-radius:10px;
+}
+
+/* RECEIPT PRINT */
+@media print{
+body *{visibility:hidden}
+#printArea, #printArea *{visibility:visible}
+#printArea{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+}
 }
 </style>
 </head>
 
 <body>
 
-<h1>🎂 Zoe's Cakes</h1>
+<h1>🎂 Zoe's Cakes 👑</h1>
 
 <div class="main">
 
 <!-- LEFT -->
-<div class="left container">
+<div class="left">
+
 <h3>Choose Cake</h3>
+
 <div class="cakes">
 
-<div class="product" onclick="selectCake('Drip Cake')">
+<div class="product" onclick="selectCake(event,'Drip Cake')">
 <div class="badge">BEST SELLER</div>
 <img src="./drip.jpg">
 <h4>🍫 Drip Cake</h4>
 </div>
 
-<div class="product" onclick="selectCake('Mini Tiered')">
+<div class="product" onclick="selectCake(event,'Mini Tiered')">
 <div class="badge">NEW</div>
 <img src="./mini.jpg">
 <h4>🧁 Mini Tiered</h4>
 </div>
 
-<div class="product" onclick="selectCake('Tiered Cake')">
+<div class="product" onclick="selectCake(event,'Tiered Cake')">
 <img src="./tiered.jpg">
 <h4>🎂 Tiered Cake</h4>
 </div>
 
-<div class="product" onclick="selectCake('With Cupcakes')">
+<div class="product" onclick="selectCake(event,'Cupcake Set')">
 <img src="./cupcake.jpg">
 <h4>🧁 Cupcake Set</h4>
 </div>
 
-<div class="product" onclick="selectCake('Wedding Cake')">
+<div class="product" onclick="selectCake(event,'Wedding Cake')">
 <img src="./wedding.jpg">
 <h4>💍 Wedding Cake</h4>
 </div>
 
 </div>
+
+</div>
+
 <!-- RIGHT -->
 <div class="right">
 
-<div class="container">
-<h3>Order 💖</h3>
+<h3>Order</h3>
 
 <input id="name" placeholder="Customer Name">
-<input id="cake" placeholder="Cake Type" readonly>
-
-<select id="size" onchange="autoPrice()">
-<option value="">Size</option>
-<option>Small</option>
-<option>Medium</option>
-<option>Large</option>
-</select>
-
-<input id="price" placeholder="Price" readonly>
-<input id="date" type="date">
+<input id="cake" placeholder="Cake">
+<input id="size" placeholder="Size">
+<input id="price" placeholder="Price">
+<input type="date" id="date">
 
 <select id="status">
 <option>Pending</option>
@@ -145,146 +159,135 @@ border-radius:10px;
 <option>Claimed</option>
 </select>
 
-<h4>GCash: 09062070504</h4>
+<button onclick="saveOrder()">Save</button>
 
-<button onclick="saveOrder()">Save Order</button>
-<button onclick="printCurrent()">Print Receipt</button>
+<h3>Total Sales: ₱<span id="total">0</span></h3>
 
-</div>
-
-<div class="container">
-<h3>Sales Tracker</h3>
-<h4>Total Sales: ₱<span id="total">0</span></h4>
+<h3>Orders</h3>
 <div id="orders"></div>
+
 </div>
 
 </div>
-</div>
+
+<!-- RECEIPT AREA -->
+<div id="printArea"></div>
 
 <script>
 
-function selectCake(cake){
+// FIREBASE
+const firebaseConfig = {
+apiKey: "AIzaSyCGJ_LtyRkZ3YzfxVIsfu2uQKQvhDOHSLg",
+authDomain: "zoes-cake-order-tracker.firebaseapp.com",
+projectId: "zoes-cake-order-tracker"
+};
 
-// remove highlight
-document.querySelectorAll(".product").forEach(p=>{
-p.classList.remove("active");
-});
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-// highlight selected
-event.currentTarget.closest(".product").classList.add("active");
+// AUTO DATE
+date.value = new Date().toISOString().split('T')[0];
 
-// fill cake name only
-document.getElementById("cake").value = cake;
-
-// CLEAR price & size (ikaw na magbutang)
-document.getElementById("price").value = "";
-document.getElementById("size").value = "";
-
+// SELECT
+function selectCake(e,cake){
+document.querySelectorAll(".product").forEach(p=>p.classList.remove("active"));
+e.currentTarget.classList.add("active");
+cakeInput().value = cake;
+priceInput().value="";
+sizeInput().value="";
 }
 
-function saveOrder(){
-let name = document.getElementById("name").value;
-let cake = document.getElementById("cake").value;
-let price = document.getElementById("price").value;
-let status = document.getElementById("status").value;
+// INPUTS
+const nameInput=()=>document.getElementById("name");
+const cakeInput=()=>document.getElementById("cake");
+const sizeInput=()=>document.getElementById("size");
+const priceInput=()=>document.getElementById("price");
+const statusInput=()=>document.getElementById("status");
 
-if(name=="" || cake=="" || price==""){
-alert("Complete the order first!");
+// SAVE
+function saveOrder(){
+if(!nameInput().value || !cakeInput().value){
+alert("Complete order!");
 return;
 }
 
-let order = {name,cake,price,status};
-
-let data = JSON.parse(localStorage.getItem("orders")) || [];
-data.push(order);
-localStorage.setItem("orders", JSON.stringify(data));
-
-alert("Saved!");
-showOrders();
+db.collection("orders").add({
+name:nameInput().value,
+cake:cakeInput().value,
+size:sizeInput().value,
+price:priceInput().value,
+status:statusInput().value,
+date:date.value
+});
 }
 
-function showOrders(){
-let data = JSON.parse(localStorage.getItem("orders")) || [];
+// DELETE
+function del(id){
+db.collection("orders").doc(id).delete();
+}
+
+// UPDATE STATUS
+function updateStatus(id,val){
+db.collection("orders").doc(id).update({status:val});
+}
+
+// PRINT RECEIPT
+function printRec(o){
+let html=`
+<h2 style="text-align:center;color:#ff4d94">Zoe's Cakes 💖</h2>
+<hr>
+<p><b>Name:</b> ${o.name}</p>
+<p><b>Cake:</b> ${o.cake}</p>
+<p><b>Size:</b> ${o.size}</p>
+<p><b>Price:</b> ₱${o.price}</p>
+<p><b>Date:</b> ${o.date}</p>
+<hr>
+<p style="text-align:center">Thank you! 💖</p>
+`;
+document.getElementById("printArea").innerHTML=html;
+window.print();
+}
+
+// LOAD
+function load(){
+db.collection("orders").onSnapshot(snap=>{
 let html="";
 let total=0;
 
-data.forEach((o,i)=>{
+snap.forEach(doc=>{
+let o=doc.data();
 
-if(o.status=="Paid"){
-total += Number(o.price);
-}
+if(o.status=="Paid") total+=Number(o.price||0);
 
-html += `
+html+=`
 <div class="order">
-${o.name} | ${o.cake} | ₱${o.price} | ${o.status}
+👤 ${o.name}<br>
+🎂 ${o.cake}<br>
+💸 ₱${o.price}<br>
+📅 ${o.date}<br>
+
+<select onchange="updateStatus('${doc.id}',this.value)">
+<option ${o.status=="Pending"?"selected":""}>Pending</option>
+<option ${o.status=="Paid"?"selected":""}>Paid</option>
+<option ${o.status=="Claimed"?"selected":""}>Claimed</option>
+</select>
+
 <br>
-<button onclick="markPaid(${i})">Paid</button>
-<button onclick="markClaim(${i})">Claimed</button>
-<button onclick="printOne(${i})">🧾</button>
-<button onclick="deleteOrder(${i})">❌</button>
-</div>`;
+<button onclick="printRec(${JSON.stringify(o).replace(/"/g,'&quot;')})">Print</button>
+<button onclick="del('${doc.id}')">Delete</button>
+</div>
+`;
 });
 
-document.getElementById("orders").innerHTML = html;
-document.getElementById("total").innerText = total;
+orders.innerHTML=html;
+totalEl.innerText=total;
+});
 }
 
-function markPaid(i){
-let data = JSON.parse(localStorage.getItem("orders"));
-data[i].status="Paid";
-localStorage.setItem("orders", JSON.stringify(data));
-showOrders();
-}
+const orders=document.getElementById("orders");
+const totalEl=document.getElementById("total");
 
-function markClaim(i){
-let data = JSON.parse(localStorage.getItem("orders"));
-data[i].status="Claimed";
-localStorage.setItem("orders", JSON.stringify(data));
-showOrders();
-}
-
-function deleteOrder(i){
-let data = JSON.parse(localStorage.getItem("orders"));
-data.splice(i,1);
-localStorage.setItem("orders", JSON.stringify(data));
-showOrders();
-}
-
-// PRINT CURRENT ORDER
-function printCurrent(){
-let name = document.getElementById("name").value;
-let cake = document.getElementById("cake").value;
-let price = document.getElementById("price").value;
-
-let w = window.open("");
-w.document.write(`
-<h2>Zoe's Cakes</h2>
-<p>${name}</p>
-<p>${cake}</p>
-<p>₱${price}</p>
-<p>GCash: 09764183834</p>
-`);
-w.print();
-}
-
-// PRINT FROM LIST
-function printOne(i){
-let data = JSON.parse(localStorage.getItem("orders"));
-let o = data[i];
-
-let w = window.open("");
-w.document.write(`
-<h2>Zoe's Cakes</h2>
-<p>${o.name}</p>
-<p>${o.cake}</p>
-<p>₱${o.price}</p>
-<p>${o.status}</p>
-<p>GCash: 09764183834</p>
-`);
-w.print();
-}
-
-showOrders();
+load();
 
 </script>
 
