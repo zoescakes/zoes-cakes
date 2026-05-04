@@ -366,6 +366,8 @@ function loadChart(orders){
 let salesPerDay = {};
 
 orders.forEach(o=>{
+if(o.status !== "Paid") return; // 👈 filter paid only
+
 let d = o.date || "No Date";
 let price = parseFloat(o.price) || 0;
 
