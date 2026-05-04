@@ -345,9 +345,13 @@ function load(){
 db.collection("orders").onSnapshot(snap=>{
 let html="";
 let total=0;
+let allOrders=[]; // 👈 ADD THIS
 
 snap.forEach(doc=>{
 let o=doc.data();
+
+// 👇 collect all orders para sa chart
+allOrders.push(o);
 
 if(o.status=="Paid") total+=Number(o.price||0);
 
@@ -373,9 +377,12 @@ html+=`
 
 orders.innerHTML=html;
 totalEl.innerText=total;
+
+// 🔥 THIS IS THE MISSING LINE
+loadChart(allOrders);
+
 });
 }
-
 const orders=document.getElementById("orders");
 const totalEl=document.getElementById("total");
 
