@@ -23,14 +23,12 @@ gap:15px;
 }
 
 .product{
+.card{
 background:white;
-border-radius:20px;
 padding:10px;
+border-radius:15px;
 text-align:center;
-position:relative;
-box-shadow:0 8px 20px rgba(255,77,148,0.2);
-cursor:pointer;
-transition:0.3s;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
 }
 .product:hover{transform:scale(1.05)}
 
@@ -187,6 +185,29 @@ z-index:1;
 
 </div>
 
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:15px;">
+
+<div class="card">
+<h4>💰 Today</h4>
+<h2 id="todaySales">0</h2>
+</div>
+
+<div class="card">
+<h4>📅 Monthly</h4>
+<h2 id="monthSales">0</h2>
+</div>
+
+<div class="card">
+<h4>🧾 Orders</h4>
+<h2 id="totalOrders">0</h2>
+</div>
+
+<div class="card">
+<h4>🏆 Top Cake</h4>
+<h2 id="topCake">-</h2>
+</div>
+
+</div>
 <!-- RIGHT -->
 <div class="right">
 
@@ -345,15 +366,33 @@ function load(){
 db.collection("orders").onSnapshot(snap=>{
 let html="";
 let total=0;
-let allOrders=[]; // 👈 ADD THIS
+let allOrders=[];
+
+let today = new Date().toISOString().split('T')[0];
+let currentMonth = today.slice(0,7);
+
+let todaySales=0;
+let monthSales=0;
+let cakeCount={};
 
 snap.forEach(doc=>{
 let o=doc.data();
-
-// 👇 collect all orders para sa chart
 allOrders.push(o);
 
-if(o.status=="Paid") total+=Number(o.price||0);
+// TOTAL SALES
+if(o.status=="Paid"){
+let price = Number(o.price||0);
+total+=price;
+
+// TODAY SALES
+if(o.date===today) todaySales+=price;
+
+// MONTH SALES
+if(o.date && o.date.startsWith(currentMonth)) monthSales+=price;
+
+// TOP CAKE
+cakeCount[o.cake]=(cakeCount[o.cake]||0)+1;
+}
 
 html+=`
 <div class="order">
@@ -375,10 +414,26 @@ html+=`
 `;
 });
 
+// TOP CAKE COMPUTE
+let topCake="-";
+let max=0;
+for(let c in cakeCount){
+if(cakeCount[c]>max){
+max=cakeCount[c];
+topCake=c;
+}
+}
+
+// DISPLAY
 orders.innerHTML=html;
 totalEl.innerText=total;
 
-// 🔥 THIS IS THE MISSING LINE
+document.getElementById("todaySales").innerText=todaySales;
+document.getElementById("monthSales").innerText=monthSales;
+document.getElementById("totalOrders").innerText=allOrders.length;
+document.getElementById("topCake").innerText=topCake;
+
+// 🔥 chart
 loadChart(allOrders);
 
 });
