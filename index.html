@@ -396,6 +396,8 @@ if(!salesPerDay[d]) salesPerDay[d] = 0;
 salesPerDay[d] += price;
 });
 
+console.log("salesPerDay:", salesPerDay);
+
 // sort dates (important for line chart)
 let labels = Object.keys(salesPerDay).sort();
 let data = labels.map(d => salesPerDay[d]);
