@@ -7,6 +7,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
 body{font-family:Arial;background:#ffe6f0;margin:0}
 h1{text-align:center;color:#ff4d94}
@@ -23,12 +24,14 @@ gap:15px;
 }
 
 .product{
-.dash-card{
 background:white;
+border-radius:20px;
 padding:10px;
-border-radius:15px;
 text-align:center;
-box-shadow:0 5px 15px rgba(0,0,0,0.1);
+position:relative;
+box-shadow:0 8px 20px rgba(255,77,148,0.2);
+cursor:pointer;
+transition:0.3s;
 }
 .product:hover{transform:scale(1.05)}
 
@@ -55,6 +58,28 @@ border:2px solid #ff4d94;
 box-shadow:0 0 10px #ff4d94;
 }
 
+/* DASHBOARD */
+.dash-card{
+background:white;
+padding:10px;
+border-radius:15px;
+text-align:center;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* CHART */
+.chart-box{
+background:white;
+padding:15px;
+border-radius:15px;
+margin-top:15px;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+#salesChart{
+width:100% !important;
+height:250px !important;
+}
+
 /* FORM */
 input,select{
 width:90%;
@@ -74,141 +99,49 @@ margin:5px;
 cursor:pointer;
 }
 
-/* ORDERS */
 .order{
 background:white;
 margin:5px;
 padding:10px;
 border-radius:10px;
 }
-
-/* RECEIPT PRINT */
-@media print{
-body *{visibility:hidden}
-#printArea, #printArea *{visibility:visible}
-#printArea{
-position:absolute;
-top:0;
-left:0;
-width:100%;
-}
-}
-.logo-overlay{
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-opacity:0.08;
-z-index:0;
-pointer-events:none;
-}
-
-.logo-overlay img{
-width:400px;
-}
-
-.main{
-position:relative;
-z-index:1;
-}
 </style>
 </head>
 
 <body>
-<body>
 
-<div class="logo-overlay">
-<img src="logo.png">
-</div>
 <h1>🎂 Zoe's Cakes 👑</h1>
 
 <div class="main">
 
-<!-- LEFT -->
 <div class="left">
+
+<!-- DASHBOARD -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:15px;">
+<div class="dash-card"><h4>💰 Today</h4><h2 id="todaySales">0</h2></div>
+<div class="dash-card"><h4>📅 Monthly</h4><h2 id="monthSales">0</h2></div>
+<div class="dash-card"><h4>🧾 Orders</h4><h2 id="totalOrders">0</h2></div>
+<div class="dash-card"><h4>🏆 Top Cake</h4><h2 id="topCake">-</h2></div>
+</div>
 
 <h3>Choose Cake</h3>
 
 <div class="cakes">
-
-<div class="product" onclick="selectCake(event,'Drip Cake')">
-<div class="badge">BEST SELLER</div>
-<img src="./drip.jpg">
-<h4>🍫 Drip Cake</h4>
+<div class="product" onclick="selectCake(event,'Drip Cake')"><img src="./drip.jpg"><h4>🍫 Drip Cake</h4></div>
+<div class="product" onclick="selectCake(event,'Mini Tiered')"><img src="./mini.jpg"><h4>🧁 Mini Tiered</h4></div>
+<div class="product" onclick="selectCake(event,'Tiered Cake')"><img src="./tiered.jpg"><h4>🎂 Tiered Cake</h4></div>
+<div class="product" onclick="selectCake(event,'Cupcake Set')"><img src="./cupcake.jpg"><h4>🧁 Cupcake Set</h4></div>
+<div class="product" onclick="selectCake(event,'Wedding Cake')"><img src="./wedding.jpg"><h4>💍 Wedding Cake</h4></div>
 </div>
 
-<div class="product" onclick="selectCake(event,'Mini Tiered')">
-<div class="badge">NEW</div>
-<img src="./mini.jpg">
-<h4>🧁 Mini Tiered</h4>
-</div>
-
-<div class="product" onclick="selectCake(event,'Tiered Cake')">
-<img src="./tiered.jpg">
-<h4>🎂 Tiered Cake</h4>
-</div>
-
-<div class="product" onclick="selectCake(event,'ube de creama')">
-<img src="./ube de creama.jpg">
-<h4>🎂 ube de creama</h4>
-</div>
-
-<div class="product" onclick="selectCake(event,'vinatgexake')">
-<img src="./vinatgexake.jpg">
-<h4>🎂 vinatgexake</h4>
-</div>
-
-<div class="product" onclick="selectCake(event,'tieredcake with cupcakes')">
-<img src="./tieredcake with cupcakes.jpg">
-<h4>🎂 tieredcake with cupcakes</h4>
-</div>
-
-<div class="product" onclick="selectCake(event,'Cupcake Set')">
-<img src="./cupcake.jpg">
-<h4>🧁 Cupcake Set</h4>
-</div>
-
-     <div class="product" onclick="selectCake(event,'black forest')">
-<img src="./black forest.jpg">
-<h4>🎂 black forest</h4>
-</div>
-
-<div class="product" onclick="selectCake(event,'Wedding Cake')">
-<img src="./wedding.jpg">
-<h4>💍 Wedding Cake</h4>
-</div>
-<div class="card">
+<!-- CHART -->
+<div class="chart-box">
 <h3>📊 Sales Chart</h3>
 <canvas id="salesChart"></canvas>
 </div>
-</div>
 
 </div>
 
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:15px;">
-
-<div class="card">
-<h4>💰 Today</h4>
-<h2 id="todaySales">0</h2>
-</div>
-
-<div class="card">
-<h4>📅 Monthly</h4>
-<h2 id="monthSales">0</h2>
-</div>
-
-<div class="card">
-<h4>🧾 Orders</h4>
-<h2 id="totalOrders">0</h2>
-</div>
-
-<div class="card">
-<h4>🏆 Top Cake</h4>
-<h2 id="topCake">-</h2>
-</div>
-
-</div>
-<!-- RIGHT -->
 <div class="right">
 
 <h3>Order</h3>
@@ -229,21 +162,15 @@ z-index:1;
 
 <h3>Total Sales: ₱<span id="total">0</span></h3>
 
-<h3>Orders</h3>
 <div id="orders"></div>
 
 </div>
-
 </div>
-
-<!-- RECEIPT AREA -->
-<div id="printArea"></div>
 
 <script>
 
-// FIREBASE
 const firebaseConfig = {
-apiKey: "AIzaSyCGJ_LtyRkZ3YzfxVIsfu2uQKQvhDOHSLg",
+apiKey: "AIzaSy...",
 authDomain: "zoes-cake-order-tracker.firebaseapp.com",
 projectId: "zoes-cake-order-tracker"
 };
@@ -251,252 +178,107 @@ projectId: "zoes-cake-order-tracker"
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// AUTO DATE
 date.value = new Date().toISOString().split('T')[0];
 
-// SELECT
 function selectCake(e,cake){
 document.querySelectorAll(".product").forEach(p=>p.classList.remove("active"));
 e.currentTarget.classList.add("active");
 cakeInput().value = cake;
-priceInput().value="";
-sizeInput().value="";
 }
 
-// INPUTS
 const nameInput=()=>document.getElementById("name");
 const cakeInput=()=>document.getElementById("cake");
-const sizeInput=()=>document.getElementById("size");
 const priceInput=()=>document.getElementById("price");
 const statusInput=()=>document.getElementById("status");
 
-// SAVE
 function saveOrder(){
-if(!nameInput().value || !cakeInput().value){
-alert("Complete order!");
-return;
-}
-
 db.collection("orders").add({
 name:nameInput().value,
 cake:cakeInput().value,
-size:sizeInput().value,
 price:priceInput().value,
 status:statusInput().value,
 date:date.value
 });
 }
 
-// DELETE
-function del(id){
-db.collection("orders").doc(id).delete();
-}
-
-// UPDATE STATUS
-function updateStatus(id,val){
-db.collection("orders").doc(id).update({status:val});
-}
-
-// PRINT RECEIPT
-function printRec(o){
-
-// format price
-let price = Number(o.price).toLocaleString("en-PH");
-
-// generate simple receipt number
-let recNo = Date.now().toString().slice(-6);
-
-// status label
-let statusLabel = o.status === "Paid" ? "PAID ✔" : "PENDING";
-
-// date now
-let now = new Date().toLocaleString();
-
-let html=`
-<div style="font-family:monospace; width:260px; padding:10px; line-height:1.6">
-
-<center>
-<b>Zoe's Cakes</b><br>
-Poblacion Sawata<br>
-Davao del Norte<br>
-Philippines 8102<br>
-09062070504
-</center>
-
-#receipt{
-font-family: monospace;
-white-space: pre;
-font-size:14px;
-line-height:1.5;
-}
---------------------------------
-Receipt No: ${recNo}
-Date Print: ${now}
-Status: ${statusLabel}
---------------------------------
-
-Name:
-${o.name}
-
-Cake:
-${o.cake}
-
-Size:
-${o.size}
-
---------------------------------
-
-TOTAL:
-₱${price}
-
---------------------------------
-
-     Thank you! 💖
-   Please come again ✨
-
-</div>
-`;
-
-document.getElementById("printArea").innerHTML=html;
-window.print();
-
-}
-// LOAD
 function load(){
 db.collection("orders").onSnapshot(snap=>{
-let html="";
-let total=0;
-let allOrders=[];
+let total=0, todaySales=0, monthSales=0;
+let allOrders=[], cakeCount={};
 
 let today = new Date().toISOString().split('T')[0];
 let currentMonth = today.slice(0,7);
-
-let todaySales=0;
-let monthSales=0;
-let cakeCount={};
 
 snap.forEach(doc=>{
 let o=doc.data();
 allOrders.push(o);
 
-// TOTAL SALES
 if(o.status=="Paid"){
-let price = Number(o.price||0);
-total+=price;
+let p=Number(o.price||0);
+total+=p;
 
-// TODAY SALES
-if(o.date===today) todaySales+=price;
+if(o.date===today) todaySales+=p;
+if(o.date && o.date.startsWith(currentMonth)) monthSales+=p;
 
-// MONTH SALES
-if(o.date && o.date.startsWith(currentMonth)) monthSales+=price;
-
-// TOP CAKE
 cakeCount[o.cake]=(cakeCount[o.cake]||0)+1;
 }
-
-html+=`
-<div class="order">
-👤 ${o.name}<br>
-🎂 ${o.cake}<br>
-💸 ₱${o.price}<br>
-📅 ${o.date}<br>
-
-<select onchange="updateStatus('${doc.id}',this.value)">
-<option ${o.status=="Pending"?"selected":""}>Pending</option>
-<option ${o.status=="Paid"?"selected":""}>Paid</option>
-<option ${o.status=="Claimed"?"selected":""}>Claimed</option>
-</select>
-
-<br>
-<button onclick="printRec(${JSON.stringify(o).replace(/"/g,'&quot;')})">Print</button>
-<button onclick="del('${doc.id}')">Delete</button>
-</div>
-`;
 });
 
-// TOP CAKE COMPUTE
-let topCake="-";
-let max=0;
+let topCake="-", max=0;
 for(let c in cakeCount){
-if(cakeCount[c]>max){
-max=cakeCount[c];
-topCake=c;
-}
+if(cakeCount[c]>max){max=cakeCount[c];topCake=c;}
 }
 
-// DISPLAY
-orders.innerHTML=html;
-totalEl.innerText=total;
-
+document.getElementById("total").innerText=total;
 document.getElementById("todaySales").innerText=todaySales;
 document.getElementById("monthSales").innerText=monthSales;
 document.getElementById("totalOrders").innerText=allOrders.length;
 document.getElementById("topCake").innerText=topCake;
 
-// 🔥 chart
 loadChart(allOrders);
-
 });
 }
-const orders=document.getElementById("orders");
-const totalEl=document.getElementById("total");
 
-load();
 let chart;
 
 function loadChart(orders){
-let salesPerDay = {};
+let sales={};
 
-// ✅ Paid only
 orders.forEach(o=>{
-if(o.status !== "Paid") return;
-
-let d = o.date || "No Date";
-let price = parseFloat(o.price) || 0;
-
-if(!salesPerDay[d]) salesPerDay[d] = 0;
-salesPerDay[d] += price;
+if(o.status!=="Paid") return;
+let d=o.date||"No Date";
+sales[d]=(sales[d]||0)+Number(o.price||0);
 });
 
-console.log("salesPerDay:", salesPerDay);
+let labels=Object.keys(sales).sort();
+let data=labels.map(d=>sales[d]);
 
-// sort dates (important for line chart)
-let labels = Object.keys(salesPerDay).sort();
-let data = labels.map(d => salesPerDay[d]);
-
-let ctx = document.getElementById('salesChart').getContext('2d');
+let ctx=document.getElementById("salesChart").getContext("2d");
 
 if(chart) chart.destroy();
 
-chart = new Chart(ctx,{
-type:'line', // 🔥 LINE CHART
+chart=new Chart(ctx,{
+type:"line",
 data:{
 labels:labels,
 datasets:[{
-label:'Sales ₱',
+label:"Sales ₱",
 data:data,
-borderWidth:3,
-tension:0.4, // 🔥 smooth curve
+borderColor:"#ff4d94",
+backgroundColor:"rgba(255,77,148,0.2)",
+tension:0.4,
 fill:true
 }]
 },
 options:{
-responsive:true,
-plugins:{
-legend:{display:true}
-},
-animation:{
-duration:1500, // 🔥 smooth animation
-easing:'easeOutQuart'
-},
-scales:{
-y:{
-beginAtZero:true
-}
-}
+animation:{duration:1500},
+scales:{y:{beginAtZero:true}}
 }
 });
 }
+
+load();
+
 </script>
 
 </body>
