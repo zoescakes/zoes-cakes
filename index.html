@@ -385,8 +385,9 @@ let chart;
 function loadChart(orders){
 let salesPerDay = {};
 
+// ✅ Paid only
 orders.forEach(o=>{
-if(o.status !== "Paid") return; // 👈 filter paid only
+if(o.status !== "Paid") return;
 
 let d = o.date || "No Date";
 let price = parseFloat(o.price) || 0;
@@ -395,21 +396,40 @@ if(!salesPerDay[d]) salesPerDay[d] = 0;
 salesPerDay[d] += price;
 });
 
-let labels = Object.keys(salesPerDay);
-let data = Object.values(salesPerDay);
+// sort dates (important for line chart)
+let labels = Object.keys(salesPerDay).sort();
+let data = labels.map(d => salesPerDay[d]);
 
 let ctx = document.getElementById('salesChart').getContext('2d');
 
 if(chart) chart.destroy();
 
 chart = new Chart(ctx,{
-type:'bar',
+type:'line', // 🔥 LINE CHART
 data:{
 labels:labels,
 datasets:[{
 label:'Sales ₱',
-data:data
+data:data,
+borderWidth:3,
+tension:0.4, // 🔥 smooth curve
+fill:true
 }]
+},
+options:{
+responsive:true,
+plugins:{
+legend:{display:true}
+},
+animation:{
+duration:1500, // 🔥 smooth animation
+easing:'easeOutQuart'
+},
+scales:{
+y:{
+beginAtZero:true
+}
+}
 }
 });
 }
