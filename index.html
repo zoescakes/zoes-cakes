@@ -12,9 +12,21 @@
 body{font-family:Arial;background:#ffe6f0;margin:0}
 h1{text-align:center;color:#ff4d94}
 
-.main{display:flex}
+.main{display:flex;position:relative;z-index:1}
 .left{width:60%;padding:10px}
 .right{width:40%;padding:10px;background:#fff0f5}
+
+/* LOGO */
+.logo-overlay{
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+opacity:0.08;
+z-index:0;
+pointer-events:none;
+}
+.logo-overlay img{width:400px}
 
 /* PRODUCTS */
 .cakes{
@@ -22,19 +34,16 @@ display:grid;
 grid-template-columns:repeat(3,1fr);
 gap:15px;
 }
-
 .product{
 background:white;
 border-radius:20px;
 padding:10px;
 text-align:center;
-position:relative;
 box-shadow:0 8px 20px rgba(255,77,148,0.2);
 cursor:pointer;
 transition:0.3s;
 }
 .product:hover{transform:scale(1.05)}
-
 .product img{
 width:100%;
 height:120px;
@@ -42,23 +51,13 @@ object-fit:cover;
 border-radius:15px;
 }
 
-.badge{
-position:absolute;
-top:10px;
-left:10px;
-background:#ff4d94;
-color:white;
-padding:3px 8px;
-border-radius:10px;
-font-size:12px;
-}
-
-.product.active{
-border:2px solid #ff4d94;
-box-shadow:0 0 10px #ff4d94;
-}
-
 /* DASHBOARD */
+.dash{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px;
+margin-bottom:15px;
+}
 .dash-card{
 background:white;
 padding:10px;
@@ -75,10 +74,7 @@ border-radius:15px;
 margin-top:15px;
 box-shadow:0 5px 15px rgba(0,0,0,0.1);
 }
-#salesChart{
-width:100% !important;
-height:250px !important;
-}
+#salesChart{width:100%!important;height:250px!important}
 
 /* FORM */
 input,select{
@@ -88,7 +84,6 @@ margin:5px;
 border-radius:8px;
 border:1px solid #ccc;
 }
-
 button{
 padding:10px;
 background:#ff4d94;
@@ -98,17 +93,30 @@ border-radius:8px;
 margin:5px;
 cursor:pointer;
 }
-
 .order{
 background:white;
 margin:5px;
 padding:10px;
 border-radius:10px;
 }
+
+/* PRINT */
+@media print{
+body *{visibility:hidden}
+#printArea, #printArea *{visibility:visible}
+#printArea{
+position:absolute;
+top:0;left:0;width:100%;
+}
+}
 </style>
 </head>
 
 <body>
+
+<div class="logo-overlay">
+<img src="logo.png">
+</div>
 
 <h1>🎂 Zoe's Cakes 👑</h1>
 
@@ -117,7 +125,7 @@ border-radius:10px;
 <div class="left">
 
 <!-- DASHBOARD -->
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:15px;">
+<div class="dash">
 <div class="dash-card"><h4>💰 Today</h4><h2 id="todaySales">0</h2></div>
 <div class="dash-card"><h4>📅 Monthly</h4><h2 id="monthSales">0</h2></div>
 <div class="dash-card"><h4>🧾 Orders</h4><h2 id="totalOrders">0</h2></div>
@@ -148,7 +156,6 @@ border-radius:10px;
 
 <input id="name" placeholder="Customer Name">
 <input id="cake" placeholder="Cake">
-<input id="size" placeholder="Size">
 <input id="price" placeholder="Price">
 <input type="date" id="date">
 
@@ -161,53 +168,61 @@ border-radius:10px;
 <button onclick="saveOrder()">Save</button>
 
 <h3>Total Sales: ₱<span id="total">0</span></h3>
-
 <div id="orders"></div>
 
 </div>
+
 </div>
+
+<!-- RECEIPT -->
+<div id="printArea"></div>
 
 <script>
 
-const firebaseConfig = {
-apiKey: "AIzaSy...",
-authDomain: "zoes-cake-order-tracker.firebaseapp.com",
-projectId: "zoes-cake-order-tracker"
+const firebaseConfig={
+apiKey:"AIzaSy...",
+authDomain:"zoes-cake-order-tracker.firebaseapp.com",
+projectId:"zoes-cake-order-tracker"
 };
-
 firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const db=firebase.firestore();
 
-date.value = new Date().toISOString().split('T')[0];
+date.value=new Date().toISOString().split('T')[0];
 
 function selectCake(e,cake){
 document.querySelectorAll(".product").forEach(p=>p.classList.remove("active"));
 e.currentTarget.classList.add("active");
-cakeInput().value = cake;
+document.getElementById("cake").value=cake;
 }
-
-const nameInput=()=>document.getElementById("name");
-const cakeInput=()=>document.getElementById("cake");
-const priceInput=()=>document.getElementById("price");
-const statusInput=()=>document.getElementById("status");
 
 function saveOrder(){
 db.collection("orders").add({
-name:nameInput().value,
-cake:cakeInput().value,
-price:priceInput().value,
-status:statusInput().value,
+name:name.value,
+cake:cake.value,
+price:price.value,
+status:status.value,
 date:date.value
 });
 }
 
+function printRec(o){
+let html=`<div style="font-family:monospace">
+Zoe's Cakes
+------------------
+Name:${o.name}
+Cake:${o.cake}
+Total:₱${o.price}
+</div>`;
+printArea.innerHTML=html;
+window.print();
+}
+
 function load(){
 db.collection("orders").onSnapshot(snap=>{
-let total=0, todaySales=0, monthSales=0;
-let allOrders=[], cakeCount={};
-
-let today = new Date().toISOString().split('T')[0];
-let currentMonth = today.slice(0,7);
+let total=0,todaySales=0,monthSales=0;
+let allOrders=[],cakeCount={};
+let today=new Date().toISOString().split('T')[0];
+let month=today.slice(0,7);
 
 snap.forEach(doc=>{
 let o=doc.data();
@@ -216,24 +231,20 @@ allOrders.push(o);
 if(o.status=="Paid"){
 let p=Number(o.price||0);
 total+=p;
-
-if(o.date===today) todaySales+=p;
-if(o.date && o.date.startsWith(currentMonth)) monthSales+=p;
-
+if(o.date==today) todaySales+=p;
+if(o.date && o.date.startsWith(month)) monthSales+=p;
 cakeCount[o.cake]=(cakeCount[o.cake]||0)+1;
 }
 });
 
-let topCake="-", max=0;
-for(let c in cakeCount){
-if(cakeCount[c]>max){max=cakeCount[c];topCake=c;}
-}
+let top="-",max=0;
+for(let c in cakeCount){if(cakeCount[c]>max){max=cakeCount[c];top=c;}}
 
-document.getElementById("total").innerText=total;
-document.getElementById("todaySales").innerText=todaySales;
-document.getElementById("monthSales").innerText=monthSales;
-document.getElementById("totalOrders").innerText=allOrders.length;
-document.getElementById("topCake").innerText=topCake;
+total.innerText=total;
+todaySales.innerText=todaySales;
+monthSales.innerText=monthSales;
+totalOrders.innerText=allOrders.length;
+topCake.innerText=top;
 
 loadChart(allOrders);
 });
@@ -243,9 +254,8 @@ let chart;
 
 function loadChart(orders){
 let sales={};
-
 orders.forEach(o=>{
-if(o.status!=="Paid") return;
+if(o.status!="Paid")return;
 let d=o.date||"No Date";
 sales[d]=(sales[d]||0)+Number(o.price||0);
 });
@@ -254,8 +264,7 @@ let labels=Object.keys(sales).sort();
 let data=labels.map(d=>sales[d]);
 
 let ctx=document.getElementById("salesChart").getContext("2d");
-
-if(chart) chart.destroy();
+if(chart)chart.destroy();
 
 chart=new Chart(ctx,{
 type:"line",
@@ -270,10 +279,7 @@ tension:0.4,
 fill:true
 }]
 },
-options:{
-animation:{duration:1500},
-scales:{y:{beginAtZero:true}}
-}
+options:{animation:{duration:1500},scales:{y:{beginAtZero:true}}}
 });
 }
 
